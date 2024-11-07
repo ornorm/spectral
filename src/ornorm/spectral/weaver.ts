@@ -1,6 +1,6 @@
 /**
  * @file weaver.ts
-* @description This file contains the implementation for the Weaver
+ * @description This file contains the implementation for the Weaver
  * module in the Spectral framework.
  * @author Aimé Biendo <abiendo@gmail.com>
  * @version 0.0.1
@@ -55,38 +55,70 @@ export class ProxyFactory<T extends object = any> implements Disposable {
         this.target = target;
     }
 
+        /**
+     * Gets whether AspectJ is used for proxying.
+     * @returns True if AspectJ is used, false otherwise.
+     */
     public get isAspectJ(): boolean {
         return this.useAspectJ;
     }
 
+    /**
+     * Sets whether to use AspectJ for proxying.
+     * @param value - True to use AspectJ, false otherwise.
+     */
     public set isAspectJ(value: boolean) {
         this.setUseAspectJ(value);
     }
 
+    /**
+     * Gets whether CGLIB is used for proxying.
+     * @returns True if CGLIB is used, false otherwise.
+     */
     public get isCglib(): boolean {
         return this.useCglib;
     }
 
+    /**
+     * Sets whether to use CGLIB for proxying.
+     * @param value - True to use CGLIB, false otherwise.
+     */
     public set isCglib(value: boolean) {
         this.setUseCglib(value);
     }
 
+    /**
+     * Gets whether the proxy is exposed.
+     * @returns True if the proxy is exposed, false otherwise.
+     */
     public get isExposed(): boolean {
         return this.exposeProxy;
     }
 
+    /**
+     * Sets whether to expose the proxy.
+     * @param value - True to expose the proxy, false otherwise.
+     */
     public set isExposed(value: boolean) {
         this.setExposeProxy(value);
     }
 
+    /**
+     * Gets whether the proxy configuration is frozen.
+     * @returns True if the configuration is frozen, false otherwise.
+     */
     public get isFrozen(): boolean {
         return this.frozen;
     }
 
+    /**
+     * Sets whether the proxy configuration is frozen.
+     * @param value - True to freeze the configuration, false otherwise.
+     */
     public set isFrozen(value: boolean) {
         this.setFrozen(value);
     }
-
+    
     /**
      * Gets the proxy object.
      */

@@ -25,4 +25,5 @@ export * from './disposable';
 export * from './join-point';
 export * from './params';
 export * from './point-cut';
+export * from './pointcut';
 export * from './weaver';

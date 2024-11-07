@@ -18,7 +18,7 @@
  * 3. This notice may not be removed or altered from any source distribution.
  */
 
-import {getParameterNames, JoinPoint} from '@ornorm/spectral';
+import {getParameterNames, JoinPoint, Method} from '@ornorm/spectral';
 
 /**
  * The type of advice that can be applied.
@@ -29,6 +29,12 @@ import {getParameterNames, JoinPoint} from '@ornorm/spectral';
  * - \`around\`: Advice to be executed around the join point, allowing to control when the join point is executed.
  */
 export type AdviceType = 'before' | 'after' | 'afterReturning' | 'afterThrowing' | 'around';
+
+/**
+ * Type representing an advice, which can be a function or a method.
+ * @see Method
+ */
+export type Advice = Function | Method;
 
 /**
  * Decorator to define a before advice.
