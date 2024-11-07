@@ -18,54 +18,20 @@
  * 3. This notice may not be removed or altered from any source distribution.
  */
 
-import {Advice, Method, PointcutSelector, Type} from '@ornorm/spectral';
+import {Advice, Advisor, PointcutSelector} from '@ornorm/spectral';
 
 /**
  * Class representing an advisor that uses a pointcut selector to determine
  * if a method matches the criteria.
  */
-export class PointcutSelectorAdvisor {
-    private readonly privateAdvice: Advice;
-    private readonly privatePointcut: PointcutSelector;
-
+export class PointcutSelectorAdvisor extends Advisor {
     /**
      * Creates an instance of `PointcutSelectorAdvisor`.
-     * @param selector - The pointcut selector to be used for matching.
      * @param advice - The advice to be applied at the pointcut.
+     * @param selector - The pointcut selector to be used for matching.
      * @see Advice
      */
-    constructor(selector: string, advice: Advice) {
-        this.privateAdvice = advice;
-        this.privatePointcut = new PointcutSelector(selector);
-    }
-
-    /**
-     * Gets the advice.
-     * @see Advice.
-     */
-    public get advice(): Advice {
-        return this.privateAdvice;
-    }
-
-    /**
-     * Gets the pointcut.
-     * @see PointcutSelector.
-     */
-    public get pointcut(): PointcutSelector {
-        return this.privatePointcut;
-    }
-
-    /**
-     * Determines if the given method matches the criteria defined by the
-     * pointcut selector.
-     * @param method The method to check against the pointcut criteria.
-     * @param type The class of the target object.
-     * @param args Additional runtime arguments.
-     * @returns True if the method matches the criteria, otherwise false.
-     */
-    public matches<T extends object = any>(
-        method: Method, type: Type<T>, args: Array<any>
-    ): boolean {
-        return this.pointcut.matches(method, type, args);
+    constructor(advice: Advice, selector: string) {
+        super(advice, new PointcutSelector(selector));
     }
 }

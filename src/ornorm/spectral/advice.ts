@@ -48,22 +48,31 @@ export type Advice = Function | Method;
  * Class representing an advisor that applies advice to join points.
  */
 export class Advisor {
-    readonly advice: Advice;
-    readonly pointcut: ClassFilter | MethodMatcher;
+    private readonly privateAdvice: Advice;
+    private readonly privatePointcut: ClassFilter | MethodMatcher;
 
     /**
      * Creates an instance of Advisor.
      * @param advice - The advice function or method to be applied.
      * @param pointcut - The pointcut expression defining where the advice
      * should be applied.
+     * @see Advice
      * @see ClassFilter
      * @see MethodMatcher
      */
     constructor(advice: Advice, pointcut: ClassFilter | MethodMatcher) {
-        this.advice = advice;
-        this.pointcut = pointcut;
+        this.privateAdvice = advice;
+        this.privatePointcut = pointcut;
     }
-    
+
+    /**
+     * Gets the advice.
+     * @see Advice.
+     */
+    public get advice(): Advice {
+        return this.privateAdvice;
+    }
+
     /**
      * Checks if the advice is applied to a class.
      * @returns True if the advice is applied to a class, false otherwise.
@@ -74,10 +83,20 @@ export class Advisor {
 
     /**
      * Checks if the advice is applied to a method.
-     * @returns True if the advice is applied to a method, false otherwise.
      */
     public get isMethodAdvice(): boolean {
         return isMethodMatcher(this.pointcut);
+    }
+
+    /**
+     * Gets the pointcut expression.
+     * @returns The pointcut expression which can be a `ClassFilter` or
+     * `MethodMatcher`.
+     * @see ClassFilter
+     * @see MethodMatcher
+     */
+    public get pointcut(): ClassFilter | MethodMatcher {
+        return this.privatePointcut;
     }
 
     /**
@@ -113,9 +132,9 @@ export class Advisor {
  */
 export function Before(pointcut: string, argNames?: string): MethodDecorator {
     return function (target: any, propertyKey: string | symbol, descriptor: PropertyDescriptor): void {
-        const originalMethod: Function = descriptor.value;
+        const originalMethod: Method = descriptor.value;
         descriptor.value = function (...args: Array<any> ): any {
-            const joinPoint: JoinPoint = new JoinPoint(this, propertyKey as string, args);
+            const joinPoint: JoinPoint = new JoinPoint(this, propertyKey.toString(), args);
             const beforeAdvices: Array<{
                 pointcut: string,
                 method: Function
@@ -123,8 +142,10 @@ export function Before(pointcut: string, argNames?: string): MethodDecorator {
             beforeAdvices.forEach((advice: { pointcut: string, method: Function }) => {
                 if (advice.pointcut === pointcut) {
                     const paramNames: Array<string> = argNames ? argNames.split(',') : getParameterNames(target.constructor, propertyKey as string);
-                    const adviceArgs: Array<string> = paramNames.map(name => {
-                        if (name === 'joinPoint') return joinPoint;
+                    const adviceArgs: Array<string> = paramNames.map((name: string) => {
+                        if (name === 'joinPoint') {
+                            return joinPoint;
+                        }
                         return args[paramNames.indexOf(name)];
                     });
                     advice.method.apply(this, adviceArgs);
