@@ -1,0 +1,25 @@
+{
+  "compilerOptions": {
+    "target": "ES6",
+    "module": "es2020",
+    "lib": ["ES6", "DOM"],
+    "outDir": "./dist",
+    "rootDir": "./src",
+    "strict": true,
+    "esModuleInterop": true,
+    "moduleResolution": "node",
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true,
+    "experimentalDecorators": true,
+    "emitDecoratorMetadata": true,
+    "baseUrl": "./",
+    "paths": {
+      "@ornorm": ["src/ornorm"],
+      "@ornorm/*": ["src/ornorm/*"],
+      "@spectral": ["src/ornorm/spectral"],
+      "@spectral/*": ["src/ornorm/spectral/*"]
+    }
+  },
+  "include": ["src/**/*", "tests/**/*"],
+  "exclude": ["dist", "docs", "node_modules"]
+}
