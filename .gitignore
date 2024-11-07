@@ -29,6 +29,8 @@ bower_components/
 dist/
 build/
 out/
+# Ignore generated documentation
+docs/
 
 # IDEs and editors
 .vscode/
