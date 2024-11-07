@@ -1,1 +1,1 @@
-import * from './spectral';
+export * from './spectral';

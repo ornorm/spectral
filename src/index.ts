@@ -1,1 +1,1 @@
-import * from './ornorm';
+export * from './ornorm';
