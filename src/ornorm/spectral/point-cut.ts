@@ -114,16 +114,17 @@ export type SelectorType = 'method' | 'class' | '#' | '&' | ':' | '*';
  * @see MethodMatcher
  */
 export class PointcutSelector implements ClassFilter, MethodMatcher {
-    private runtime: boolean = false;
+    protected isStaticPointcut: boolean = false;
     protected readonly selector: string;
     protected type: SelectorType = 'method';
 
-    constructor(selector: string) {
+    constructor(selector: string, isStaticPointcut: boolean = false) {
         this.selector = selector;
+        this.isStaticPointcut = isStaticPointcut;
     }
 
     public get isRuntime(): boolean {
-        return this.runtime;
+        return this.isStaticPointcut;
     }
 
     /**
@@ -141,7 +142,7 @@ export class PointcutSelector implements ClassFilter, MethodMatcher {
             return this.isAssignableFrom(type);
         }
         if (this.selector.startsWith(':')) {
-
+            return this.matchType(type);
         }
         const machType: boolean = this.matchPointcut(type);
 
@@ -151,12 +152,12 @@ export class PointcutSelector implements ClassFilter, MethodMatcher {
     /**
      * @inheritDoc
      */
-    public matches<T = any>(method: Function, type: Type<T>): boolean;
+    public matches<T extends object = any>(method: Function, type: Type<T>): boolean;
 
     /**
      * @inheritDoc
      */
-    public matches<T = any>(method: Function, type: Type<T>, args: Array<any>): boolean;
+    public matches<T extends object = any>(method: Function, type: Type<T>, args: Array<any>): boolean;
 
     /**
      * Determines if the given method matches the criteria defined by the
@@ -166,7 +167,7 @@ export class PointcutSelector implements ClassFilter, MethodMatcher {
      * @param args Additional runtime arguments.
      * @returns True if the method matches the criteria, otherwise false.
      */
-    public matches<T = any>(
+    public matches<T extends object = any>(
         method: Function,
         type: Type<T>,
         ...args: Array<any>
@@ -177,21 +178,27 @@ export class PointcutSelector implements ClassFilter, MethodMatcher {
         }
         let machType: boolean = false;
         let machMethod: boolean = false;
-        if (args.length >= 2) {
-            if (this.selector.startsWith('#')) {
-                machType = this.matchId(type);
-            } else if (this.selector.startsWith('&')) {
-                machType = this.isAssignableFrom(type);
-            } else if (this.selector.startsWith(':')) {
-            } else {
-                machType = this.matchPointcut(type);
+        if (this.isRuntime) {
+            // Runtime pointcut: consider method arguments
+            if (args.length >= 2) {
+                if (this.selector.startsWith('#')) {
+                    machType = this.matchId(type);
+                } else if (this.selector.startsWith('&')) {
+                    machType = this.isAssignableFrom(type);
+                } else if (this.selector.startsWith(':')) {
+                    machType = this.matchType(type);
+                } else {
+                    machType = this.isDeclaredMethod(method, type);
+                }
+                machMethod = this.matchPointcut(method);
+            } else if (args.length === 1) {
+                machMethod = this.matchPointcut(method);
             }
-            machMethod = this.matchPointcut(method);
-        } else if (args.length === 1) {
+        } else {
+            // Static pointcut: do not consider method arguments
             machMethod = this.matchPointcut(method);
         }
-
-        return false;
+        return machType && machMethod;
     }
 
     /**
@@ -203,6 +210,16 @@ export class PointcutSelector implements ClassFilter, MethodMatcher {
         const specifiedType: string = this.selector.slice(1);
         const targetType: Type = Reflect.getMetadata('design:type', type);
         return targetType && targetType.prototype && targetType.prototype.isPrototypeOf(specifiedType);
+    }
+
+    /**
+     *  Check if this pointcut ever matches the given method on a target class.
+     * @param method The method to check against the matcher criteria.
+     * @param type The class to check against the method.
+     * @returns True if the method matches the criteria, otherwise false.
+     */
+    protected isDeclaredMethod<T extends object = any>(method: Function, type: Type<T>): boolean {
+        return Reflect.has(type.prototype, method.name);
     }
 
     /**
@@ -310,6 +327,37 @@ export class PointcutSelector implements ClassFilter, MethodMatcher {
             default:
                 return !!attrValue;
         }
+    }
+
+    /**
+     * The type selector matches classes by name.
+     *
+     * In other words, it selects all classes of the given type within a project.
+     *
+     * @param type The class to check against the selector.
+     * @returns True if the class matches the selector, otherwise false.
+     * @see Type
+     */
+    protected matchType<T = any>(type: Type<T>): boolean {
+        const selector: string = this.selector;
+        const namespaceRegex = /^(\w+|\*)\|(\w+)$/;
+        const noNamespaceRegex = /^\|(\w+)$/;
+        const namespaceMatch: RegExpMatchArray | null = selector.match(namespaceRegex);
+        const noNamespaceMatch: RegExpMatchArray | null = selector.match(noNamespaceRegex);
+        if (namespaceMatch) {
+            const [_, namespace, typeName] = namespaceMatch;
+            const typeNamespace: any = Reflect.getMetadata('namespace', type);
+            if ((namespace === '*' || namespace === typeNamespace) && typeName === type.name) {
+                return true;
+            }
+        } else if (noNamespaceMatch) {
+            const [_, typeName] = noNamespaceMatch;
+            if (typeName === type.name) {
+                return true;
+            }
+        }
+
+        return false;
     }
 }
 
