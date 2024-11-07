@@ -1,6 +1,8 @@
 /**
  * @file advice.ts
- * @description This file contains the implementation of advice decorators for the Spectral framework. * @author Aimé Biendo <abiendo@gmail.com>
+ * @description This file contains the implementation of advice decorators
+ * for the Spectral framework.
+ * @author Aimé Biendo <abiendo@gmail.com>
  * @version 0.0.1
  *
  * @license MIT

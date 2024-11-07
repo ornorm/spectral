@@ -1,6 +1,7 @@
 /**
  * @file point-cut.ts
- * @description This file contains the implementation of pointcut expressions and matchers for the Spectral framework.
+ * @description This file contains the implementation of pointcut
+ * expressions and matchers for the Spectral framework.
  * @author Aimé Biendo <abiendo@gmail.com>
  * @version 0.0.1
  *
@@ -104,7 +105,7 @@ export interface PointcutModel {
     methodMatcher?: MethodMatcher;
 }
 
-export type SelectorType = 'method' | 'class' | '#' | '&' | '$' | '*';
+export type SelectorType = 'method' | 'class' | '#' | '&' | ':' | '*';
 
 /**
  * Class representing a method matcher.
@@ -138,6 +139,9 @@ export class PointcutSelector implements ClassFilter, MethodMatcher {
         }
         if (this.selector.startsWith('&')) {
             return this.isAssignableFrom(type);
+        }
+        if (this.selector.startsWith(':')) {
+
         }
         const machType: boolean = this.matchPointcut(type);
 
@@ -178,6 +182,7 @@ export class PointcutSelector implements ClassFilter, MethodMatcher {
                 machType = this.matchId(type);
             } else if (this.selector.startsWith('&')) {
                 machType = this.isAssignableFrom(type);
+            } else if (this.selector.startsWith(':')) {
             } else {
                 machType = this.matchPointcut(type);
             }
@@ -305,26 +310,6 @@ export class PointcutSelector implements ClassFilter, MethodMatcher {
             default:
                 return !!attrValue;
         }
-    }
-}
-
-/**
- * Class representing a pointcut object.
- * Implements the  PointcutModel interface.
- */
-export class PointcutObject implements  PointcutModel {
-    classFilter?: ClassFilter;
-    methodMatcher?: MethodMatcher;
-
-    /**
-     * Creates an instance of PointcutObject.
-     * @param expression The pointcut expression.
-     * @param method The method associated with the pointcut.
-     */
-    constructor(
-        public expression: string,
-        public method: Function
-    ) {
     }
 }
 
