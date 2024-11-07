@@ -18,7 +18,15 @@
  * 3. This notice may not be removed or altered from any source distribution.
  */
 
-import {getParameterNames, JoinPoint, Method} from '@ornorm/spectral';
+import {
+    ClassFilter,
+    getParameterNames,
+    isClassFilter,
+    isMethodMatcher,
+    JoinPoint,
+    Method,
+    MethodMatcher
+} from '@ornorm/spectral';
 
 /**
  * The type of advice that can be applied.
@@ -35,6 +43,67 @@ export type AdviceType = 'before' | 'after' | 'afterReturning' | 'afterThrowing'
  * @see Method
  */
 export type Advice = Function | Method;
+
+/**
+ * Class representing an advisor that applies advice to join points.
+ */
+export class Advisor {
+    readonly advice: Advice;
+    readonly pointcut: ClassFilter | MethodMatcher;
+
+    /**
+     * Creates an instance of Advisor.
+     * @param advice - The advice function or method to be applied.
+     * @param pointcut - The pointcut expression defining where the advice
+     * should be applied.
+     * @see ClassFilter
+     * @see MethodMatcher
+     */
+    constructor(advice: Advice, pointcut: ClassFilter | MethodMatcher) {
+        this.advice = advice;
+        this.pointcut = pointcut;
+    }
+    
+    /**
+     * Checks if the advice is applied to a class.
+     * @returns True if the advice is applied to a class, false otherwise.
+     */
+    public get isClassAdvice(): boolean {
+        return isClassFilter(this.pointcut);
+    }
+
+    /**
+     * Checks if the advice is applied to a method.
+     * @returns True if the advice is applied to a method, false otherwise.
+     */
+    public get isMethodAdvice(): boolean {
+        return isMethodMatcher(this.pointcut);
+    }
+
+    /**
+     * Executes the advice logic at the join point.
+     * @param joinPoint - The join point where the advice should be applied.
+     * @param args - The arguments to be passed to the advice method.
+     * @returns The result of the advice execution.
+     * @see JoinPoint
+     */
+    public execute<T extends object = any>(
+        joinPoint: JoinPoint<T>, ...args: Array<any>
+    ): any {
+        if (
+            isClassFilter(this.pointcut) &&
+            this.pointcut.filter(joinPoint.type)
+        ) {
+            return this.advice.call(joinPoint.scope, ...args);
+        } else if (
+            isMethodMatcher(this.pointcut) &&
+            this.pointcut.matches(joinPoint.method, joinPoint.type, joinPoint.args)
+        ) {
+            return this.advice.call(joinPoint.scope, ...args);
+        }
+    }
+}
+
 
 /**
  * Decorator to define a before advice.

@@ -1,6 +1,6 @@
 /**
- * @file regexp-method-pointcut-advisor.ts
-*  @description This file contains the implementation of the RegexpMethodPointcutAdvisor
+ * @file point-cut-selector-advisor.ts
+ * @description This file contains the implementation of the PointcutSelectorAdvisor
  * class for the Spectral framework.
  * @author Aimé Biendo <abiendo@gmail.com>
  * @version 0.0.1
@@ -18,24 +18,25 @@
  * 3. This notice may not be removed or altered from any source distribution.
  */
 
-import { Advice, RegexpMethodPointcut } from '@ornorm/spectral';
+import {Advice, Method, PointcutSelector, Type} from '@ornorm/spectral';
 
 /**
- * Class representing a pointcut advisor that combines a pointcut and an advice.
+ * Class representing an advisor that uses a pointcut selector to determine
+ * if a method matches the criteria.
  */
-export class RegexpMethodPointcutAdvisor {
+export class PointcutSelectorAdvisor {
     private readonly privateAdvice: Advice;
-    private readonly privatePointcut: RegexpMethodPointcut;
+    private readonly privatePointcut: PointcutSelector;
 
     /**
-     * Creates an instance of RegexpMethodPointcutAdvisor.
-     * @param patterns - An array of string patterns to be used in the pointcut.
+     * Creates an instance of `PointcutSelectorAdvisor`.
+     * @param selector - The pointcut selector to be used for matching.
      * @param advice - The advice to be applied at the pointcut.
      * @see Advice
      */
-    constructor(patterns: Array<string>, advice: Advice) {
+    constructor(selector: string, advice: Advice) {
         this.privateAdvice = advice;
-        this.privatePointcut = new RegexpMethodPointcut(patterns);
+        this.privatePointcut = new PointcutSelector(selector);
     }
 
     /**
@@ -48,9 +49,23 @@ export class RegexpMethodPointcutAdvisor {
 
     /**
      * Gets the pointcut.
-     * @see RegexpMethodPointcut.
+     * @see PointcutSelector.
      */
-    public get pointcut(): RegexpMethodPointcut {
+    public get pointcut(): PointcutSelector {
         return this.privatePointcut;
+    }
+
+    /**
+     * Determines if the given method matches the criteria defined by the
+     * pointcut selector.
+     * @param method The method to check against the pointcut criteria.
+     * @param type The class of the target object.
+     * @param args Additional runtime arguments.
+     * @returns True if the method matches the criteria, otherwise false.
+     */
+    public matches<T extends object = any>(
+        method: Method, type: Type<T>, args: Array<any>
+    ): boolean {
+        return this.pointcut.matches(method, type, args);
     }
 }

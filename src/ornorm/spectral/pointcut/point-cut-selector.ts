@@ -1,4 +1,26 @@
-import {ClassFilter, Method, MethodMatcher, Type} from '@ornorm/spectral';
+/**
+ * @file point-cut-selector.ts
+* @description This file contains the implementation of the PointcutSelector
+ * class for the Spectral framework.
+ * @author Aimé Biendo <abiendo@gmail.com>
+ * @version 0.0.1
+ *
+ * @license MIT
+ *
+ * (c) 2023 Spectral Software Inc. All rights reserved.
+ *
+ * This software is provided "as-is," without any express or implied warranty. In no event shall the authors be held liable for any damages arising from the use of this software.
+ *
+ * Permission is granted to anyone to use this software for any purpose, including commercial applications, and to alter it and redistribute it freely, subject to the following restrictions:
+ *
+ * 1. The origin of this software must not be misrepresented; you must not claim that you wrote the original software. If you use this software in a product, an acknowledgment in the product documentation would be appreciated but is not required.
+ * 2. Altered source versions must be plainly marked as such, and must not be misrepresented as being the original software.
+ * 3. This notice may not be removed or altered from any source distribution.
+ */
+
+import {
+    ClassFilter, JoinPointTarget, Method, MethodMatcher, Type
+} from '@ornorm/spectral';
 
 /**
  * Represents the possible target types for selectors.
@@ -132,9 +154,7 @@ export class PointcutSelector implements ClassFilter, MethodMatcher {
      * @returns True if the method matches the criteria, otherwise false.
      */
     public matches<T extends object = any>(
-        method: Method,
-        type: Type<T>,
-        ...args: Array<any>
+        method: Method, type: Type<T>, ...args: Array<any>
     ): boolean {
         if (this.isSelectingAll) {
             return true;
@@ -251,21 +271,20 @@ export class PointcutSelector implements ClassFilter, MethodMatcher {
      * having a given attribute explicitly set, with options for defining an
      * attribute value or substring value match.
      *
-     * @param methodOrType The method or type to check against the
+     * @param joinPoint The method or type to check against the
      * matcher criteria.
      * @returns True if the method or type matches the criteria, otherwise
      * false.
-     * @see Method
-     * @see Type
+     * @see JoinPointTarget
      */
-    protected matchPointcut(methodOrType: Method | Type): boolean {
+    protected matchPointcut(joinPoint: JoinPointTarget): boolean {
         const regex: RegExp = /\[(\w+)([~|^$*]?=)?(".*?"|'.*?'|\w+)?([is]?)\]/;
         const match: RegExpMatchArray | null = this.selector.match(regex);
         if (!match) {
             return false;
         }
         const [, attr, operator, value, flag]: RegExpMatchArray = match;
-        const attrValue: any = Reflect.getMetadata(attr, methodOrType);
+        const attrValue: any = Reflect.getMetadata(attr, joinPoint);
         if (!attrValue) {
             return false;
         }
@@ -282,8 +301,8 @@ export class PointcutSelector implements ClassFilter, MethodMatcher {
                 Represents methods with an attribute name of attr whose value is exactly value.
                  */
                 return isCaseInsensitiveHtmlAttribute
-                    ? methodOrType.name.toLowerCase() === attrValue.toLowerCase()
-                    : methodOrType.name === attrValue;
+                    ? joinPoint.name.toLowerCase() === attrValue.toLowerCase()
+                    : joinPoint.name === attrValue;
             case '~=':
                 /*
                 [attr~=value]
@@ -295,7 +314,7 @@ export class PointcutSelector implements ClassFilter, MethodMatcher {
                     isCaseInsensitiveHtmlAttribute ? attrValue.toLowerCase() : attrValue
                 ).split(' ').some((part: string): boolean => (
                     part === (
-                        isCaseInsensitiveHtmlAttribute ? methodOrType.name.toLowerCase() : methodOrType.name
+                        isCaseInsensitiveHtmlAttribute ? joinPoint.name.toLowerCase() : joinPoint.name
                     )
                 ));
             case '|=':
@@ -306,15 +325,15 @@ export class PointcutSelector implements ClassFilter, MethodMatcher {
                 (U+0024).
                 */
                 if (isCaseInsensitiveHtmlAttribute) {
-                    if (methodOrType.name.toLowerCase() === attrValue.toLowerCase()) {
+                    if (joinPoint.name.toLowerCase() === attrValue.toLowerCase()) {
                         return true;
                     }
-                    return methodOrType.name.toLowerCase().startsWith(attrValue.toLowerCase() + '$');
+                    return joinPoint.name.toLowerCase().startsWith(attrValue.toLowerCase() + '$');
                 }
-                if (methodOrType.name === attrValue) {
+                if (joinPoint.name === attrValue) {
                     return true;
                 }
-                return methodOrType.name.startsWith(attrValue + '$');
+                return joinPoint.name.startsWith(attrValue + '$');
             case '^=':
                 /*
                 [attr^=value]
@@ -322,8 +341,8 @@ export class PointcutSelector implements ClassFilter, MethodMatcher {
                 is prefixed (preceded) by value.
                  */
                 return isCaseInsensitiveHtmlAttribute
-                    ? methodOrType.name.toLowerCase().startsWith(attrValue.toLowerCase())
-                    : methodOrType.name.startsWith(attrValue);
+                    ? joinPoint.name.toLowerCase().startsWith(attrValue.toLowerCase())
+                    : joinPoint.name.startsWith(attrValue);
             case '$=':
                 /*
                 [attr$=value]
@@ -331,8 +350,8 @@ export class PointcutSelector implements ClassFilter, MethodMatcher {
                 is suffixed (followed) by value.
                  */
                 return isCaseInsensitiveHtmlAttribute
-                    ? methodOrType.name.toLowerCase().endsWith(attrValue.toLowerCase())
-                    : methodOrType.name.endsWith(attrValue);
+                    ? joinPoint.name.toLowerCase().endsWith(attrValue.toLowerCase())
+                    : joinPoint.name.endsWith(attrValue);
             case '*=':
                 /*
                 [attr*=value]
@@ -340,8 +359,8 @@ export class PointcutSelector implements ClassFilter, MethodMatcher {
                 contains at least one occurrence of value within the string.
                  */
                 return isCaseInsensitiveHtmlAttribute
-                    ? methodOrType.name.toLowerCase().includes(attrValue.toLowerCase())
-                    : methodOrType.name.includes(attrValue);
+                    ? joinPoint.name.toLowerCase().includes(attrValue.toLowerCase())
+                    : joinPoint.name.includes(attrValue);
             default:
                 return !!attrValue;
         }

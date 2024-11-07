@@ -48,6 +48,16 @@ export interface ClassFilter {
 }
 
 /**
+ * Checks if the given object is a ClassFilter.
+ * @param obj The object to check.
+ * @returns True if the object is a ClassFilter, otherwise false.
+ * @see ClassFilter
+ */
+export function isClassFilter(obj: any): obj is ClassFilter {
+    return obj && typeof obj.filter === 'function';
+}
+
+/**
  * The MethodMatcher interface is used to restrict the pointcut to a given
  * set of target methods.
  *
@@ -82,6 +92,17 @@ export interface MethodMatcher {
      * @see Type
      */
     matches<T = any>(method: Method, type: Type<T>, args: Array<any>): boolean;
+}
+
+/**
+ * Checks if the given object is a MethodMatcher.
+ * @param obj The object to check.
+ * @returns True if the object is a MethodMatcher, otherwise false.
+ * @see MethodMatcher
+ */
+export function isMethodMatcher(obj: any): obj is MethodMatcher {
+    return obj && typeof obj.isRuntime === 'boolean' &&
+        typeof obj.matches === 'function';
 }
 
 /**

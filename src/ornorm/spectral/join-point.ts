@@ -18,52 +18,74 @@
  * 3. This notice may not be removed or altered from any source distribution.
  */
 
+import {Method, Type} from '@ornorm/spectral';
+
+/**
+ * Type representing a target for a join point.
+ * It can be either a method or a type.
+ * @see Method
+ * @see Type
+ */
+export type JoinPointTarget<T = any> = Method<T> | Type<T>;
+
 /**
  * Class representing a join point in the program execution.
  */
-export class JoinPoint {
+export class JoinPoint<T extends object = any> {
+    public readonly privateArgs: Array<any>;
+    public readonly privateMethod?: string;
+    private readonly privateTarget: any;
+
     /**
-     * Creates an instance of JoinPoint.
-     * @param target - The target object.
-     * @param method - The method name.
-     * @param args - The arguments passed to the method.
+     * Creates an instance of `JoinPoint`.
+     * @param target The target object.
+     * @param method The method name.
+     * @param args The arguments passed to the method.
+     * @see JoinPointTarget
      */
-    constructor(
-        public target: any,
-        public method: string,
-        public args: any[]) {
+    constructor(target: any, method?: string, args?: Array<any>) {
+        this.privateTarget = target;
+        this.privateMethod = method;
+        this.privateArgs = args || [];
     }
 
     /**
      * Gets the arguments passed to the method.
      * @returns The arguments.
      */
-    public getArgs(): Array<any> {
-        return this.args;
+    public get args(): Array<any> {
+        return this.privateArgs;
+    }
+
+    /**
+     * Gets the target object.
+     */
+    public get scope(): any {
+        return this.privateTarget;
+    }
+
+    /**
+     * Gets the method associated with the join point.
+     * @returns The method if it exists, otherwise undefined.
+     */
+    public get method(): Method<T> {
+        return Reflect.get(this.privateTarget, this.privateMethod || '');
     }
 
     /**
      * Gets the method signature.
      * @returns The method signature.
      */
-    public getSignature(): string {
-        return this.method;
+    public get signature(): string | undefined {
+        return this.privateMethod;
     }
 
     /**
-     * Gets the target object.
-     * @returns The target object.
+     * Gets the type of the target object.
+     * @returns The constructor of the target object.
      */
-    public getTarget(): any {
-        return this.target.constructor;
-    }
-
-    /**
-     * Gets the target object.
-     * @returns The target object.
-     */
-    public getThis(): any {
-        return this.target;
+    public get type(): Type<T> {
+        return this.privateTarget.constructor;
     }
 
     /**
@@ -71,6 +93,9 @@ export class JoinPoint {
      * @returns The string representation.
      */
     public toString(): string {
-        return `${this.getTarget().name}.${this.getSignature()}(${this.getArgs().join(', ')})`;
+        if (this.signature === undefined) {
+            return `${this.type.name} class`;
+        }
+        return `${this.method.name}.${this.signature}(${this.args.join(', ')})`;
     }
 }
