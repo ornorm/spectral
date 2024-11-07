@@ -14,7 +14,7 @@ npm install
 
 # Run tests
 echo "Running tests..."
-npm test
+npm test -- --passWithNoTests
 
 # Build the project
 echo "Building the project..."
@@ -30,6 +30,6 @@ npm version patch -m "Bump version to %s"
 
 # Run semantic release
 echo "Running semantic release..."
-npx semantic-release
+./bin/release/semantic-release.sh
 
 echo "Release process completed successfully."

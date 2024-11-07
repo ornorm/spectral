@@ -8,5 +8,5 @@
     "@semantic-release/github",
     "@semantic-release/git"
   ],
-  changelogFile: 'CHANGELOG.md'
+  "changelogFile": "CHANGELOG.md"
 }
