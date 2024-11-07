@@ -283,6 +283,7 @@ export class Weaver {
      * Configures the AOP weaver with the given configuration.
      * @param config - The AOP configuration.
      * @returns A promise that resolves when the configuration is complete.
+     * @see AopConfig
      */
     public static boot(config: AopConfig): Promise<void> {
         return new Promise<void>(async (resolve, reject) => {

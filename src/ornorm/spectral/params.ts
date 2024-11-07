@@ -18,6 +18,8 @@
  * 3. This notice may not be removed or altered from any source distribution.
  */
 
+import {Method} from '@ornorm/spectral';
+
 /**
  * Interface for discovering parameter names.
  */
@@ -27,8 +29,9 @@ export interface ParameterNameDiscoverer {
      * @param target - The target function.
      * @param methodName - The name of the method.
      * @returns An array of parameter names or undefined if not found.
+     * @see Method
      */
-    getParameterNames(target: Function, methodName: string): Array<string> | undefined;
+    getParameterNames(target: Method, methodName: string): Array<string> | undefined;
 }
 
 /**
@@ -40,7 +43,7 @@ export class AnnotationParameterNameDiscoverer implements ParameterNameDiscovere
     /**
      * @inheritdoc
      */
-    public getParameterNames(target: Function, methodName: string): Array<string> | undefined {
+    public getParameterNames(target: Method, methodName: string): Array<string> | undefined {
         const metadata: string | undefined =
             Reflect.getMetadata('argNames', target.prototype, methodName);
         return metadata ? metadata.split(',') : undefined;
@@ -56,8 +59,8 @@ export class StandardReflectionParameterNameDiscoverer implements ParameterNameD
     /**
      * @inheritdoc
      */
-    public getParameterNames(target: Function, methodName: string): Array<string> | undefined {
-        const method: Function | undefined = target.prototype[methodName];
+    public getParameterNames(target: Method, methodName: string): Array<string> | undefined {
+        const method: Method | undefined = Reflect.get(target.prototype, methodName);
         if (method && method.length) {
             return Reflect.getMetadata('design:paramtypes', target.prototype, methodName)
                 .map((param: any) => param.name);
@@ -77,8 +80,9 @@ const parameterNameDiscoverers: ParameterNameDiscoverer[] = [
  * @param methodName - The name of the method.
  * @returns An array of parameter names.
  * @throws TypeError if unable to determine parameter names.
+ * @see Method
  */
-export function getParameterNames(target: Function, methodName: string): Array<string> {
+export function getParameterNames(target: Method, methodName: string): Array<string> {
     for (const discoverer of parameterNameDiscoverers) {
         const names: Array<string> | undefined = discoverer.getParameterNames(target, methodName);
         if (names) {

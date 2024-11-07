@@ -24,6 +24,17 @@
 import 'reflect-metadata';
 
 /**
+ * Type alias representing a method.
+ * A method is a function with a specific length and name.
+ * @template T - The return type of the method.
+ */
+export type Method<T = any> = Function & {
+    (...args: Array<any>): T;
+    readonly length: number;
+    readonly name: string;
+};
+
+/**
  * Type representing a class constructor.
  * @template T - The type of the class instance.
  */
@@ -37,8 +48,9 @@ export type Type<T = any> = {
 /**
  * Decorator to mark a class as an aspect.
  * @param target - The target class to be marked as an aspect.
+ * @see Type
  */
-export function Aspect(target: Function): void {
+export function Aspect<T = any>(target: Type<T>): void {
     Reflect.defineMetadata('aspect', true, target);
 }
 
@@ -46,9 +58,9 @@ export function Aspect(target: Function): void {
  * Annotation to specify the order of an aspect.
  * @param order - The order value.
  * @returns A class decorator to apply the order.
+ * @see ClassDecorator
  */
 export function Order(order: number): ClassDecorator {
-    return function (target: Function): void {
+    return (target: any) =>
         Reflect.defineMetadata('order', order, target);
-    };
 }

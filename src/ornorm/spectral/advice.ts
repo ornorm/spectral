@@ -39,7 +39,7 @@ export type AdviceType = 'before' | 'after' | 'afterReturning' | 'afterThrowing'
 export function Before(pointcut: string, argNames?: string): MethodDecorator {
     return function (target: any, propertyKey: string | symbol, descriptor: PropertyDescriptor): void {
         const originalMethod: Function = descriptor.value;
-        descriptor.value = function (...args: any[]): any {
+        descriptor.value = function (...args: Array<any> ): any {
             const joinPoint: JoinPoint = new JoinPoint(this, propertyKey as string, args);
             const beforeAdvices: Array<{
                 pointcut: string,
@@ -76,7 +76,7 @@ export function Before(pointcut: string, argNames?: string): MethodDecorator {
 export function AfterReturning(pointcut: string, argNames?: string): MethodDecorator {
     return function (target: any, propertyKey: string | symbol, descriptor: PropertyDescriptor): void {
         const originalMethod: Function = descriptor.value;
-        descriptor.value = function (...args: any[]): any {
+        descriptor.value = function (...args: Array<any> ): any {
             const result: any = originalMethod.apply(this, args);
             const joinPoint: JoinPoint = new JoinPoint(this, propertyKey as string, args);
             const afterReturningAdvices: Array<{
@@ -115,7 +115,7 @@ export function AfterReturning(pointcut: string, argNames?: string): MethodDecor
 export function AfterThrowing(pointcut: string, argNames?: string): MethodDecorator {
     return function (target: any, propertyKey: string | symbol, descriptor: PropertyDescriptor): void {
         const originalMethod: Function = descriptor.value;
-        descriptor.value = function (...args: any[]): any {
+        descriptor.value = function (...args: Array<any> ): any {
             try {
                 return originalMethod.apply(this, args);
             } catch (error: any) {
@@ -157,7 +157,7 @@ export function AfterThrowing(pointcut: string, argNames?: string): MethodDecora
 export function After(pointcut: string, argNames?: string): MethodDecorator {
     return function (target: any, propertyKey: string | symbol, descriptor: PropertyDescriptor): void {
         const originalMethod: Function = descriptor.value;
-        descriptor.value = function (...args: any[]): any {
+        descriptor.value = function (...args: Array<any> ): any {
             const joinPoint: JoinPoint = new JoinPoint(this, propertyKey as string, args);
             const afterAdvices: Array<{
                 pointcut: string,
@@ -197,7 +197,7 @@ export function After(pointcut: string, argNames?: string): MethodDecorator {
 export function Around(pointcut: string, argNames?: string): MethodDecorator {
     return function (target: any, propertyKey: string | symbol, descriptor: PropertyDescriptor): void {
         const originalMethod: Function = descriptor.value;
-        descriptor.value = function (...args: any[]): any {
+        descriptor.value = function (...args: Array<any> ): any {
             const joinPoint: JoinPoint = new JoinPoint(this, propertyKey as string, args);
             const aroundAdvices: Array<{
                 pointcut: string,

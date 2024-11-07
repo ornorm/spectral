@@ -18,7 +18,7 @@
  * 3. This notice may not be removed or altered from any source distribution.
  */
 
-import {Type} from '@ornorm/spectral';
+import {Method, Type} from '@ornorm/spectral';
 
 /**
  * Type alias for a function that validates whether a given target matches
@@ -66,9 +66,10 @@ export interface MethodMatcher {
      * @param method The method to check against the matcher criteria.
      * @param type The class of the target object.
      * @returns True if the method matches the criteria, otherwise false.
+     * @see Method
      * @see Type
      */
-    matches<T = any>(method: Function, type: Type<T>): boolean;
+    matches<T = any>(method: Method, type: Type<T>): boolean;
 
     /**
      * Determines if the given method matches the criteria defined by the
@@ -77,9 +78,10 @@ export interface MethodMatcher {
      * @param type The class of the target object.
      * @param args Additional runtime arguments.
      * @returns True if the method matches the criteria, otherwise false.
+     * @see Method
      * @see Type
      */
-    matches<T = any>(method: Function, type: Type<T>, args: Array<any>): boolean;
+    matches<T = any>(method: Method, type: Type<T>, args: Array<any>): boolean;
 }
 
 /**
@@ -105,7 +107,8 @@ export interface PointcutModel {
     methodMatcher?: MethodMatcher;
 }
 
-export type SelectorType = 'method' | 'class' | '#' | '&' | ':' | '*';
+export type TokenType = '#' | '&' | ':' | '*';
+export type SelectorType = 'method' | 'class';
 
 /**
  * Class representing a method matcher.
@@ -116,29 +119,67 @@ export type SelectorType = 'method' | 'class' | '#' | '&' | ':' | '*';
 export class PointcutSelector implements ClassFilter, MethodMatcher {
     protected isStaticPointcut: boolean = false;
     protected readonly selector: string;
+    protected tokenType: TokenType | null = null;
     protected type: SelectorType = 'method';
 
     constructor(selector: string, isStaticPointcut: boolean = false) {
         this.selector = selector;
         this.isStaticPointcut = isStaticPointcut;
+        this.determineTokenType();
     }
 
+    /**
+     * Checks if the selector is for a class.
+     * @returns {boolean} True if the selector is for a class, otherwise false.
+     */
+    public get isClassSelector(): boolean {
+        return this.type === 'class';
+    }
+
+    /**
+     * Checks if the selector is for a method.
+     * @returns {boolean} True if the selector is for a method, otherwise false.
+     */
+    public get isMethodSelector(): boolean {
+        return this.type === 'method';
+    }
+
+    /**
+     * Indicates whether the pointcut is evaluated at runtime.
+     * @returns  True if the pointcut is evaluated at runtime, otherwise false.
+     */
     public get isRuntime(): boolean {
         return this.isStaticPointcut;
     }
 
+    /**
+     * Checks if the selector matches all targets.
+     * @returns  True if the selector matches all targets, otherwise false.
+     */
     public get isSelectingAll(): boolean {
         return this.selector === '*';
     }
 
+    /**
+     * Checks if the selector matches by instance.
+     * @returns  True if the selector matches by instance, otherwise false.
+     */
     public get isSelectingByInstance(): boolean {
         return this.selector.startsWith('&');
     }
 
+    /**
+     * Checks if the selector matches by type.
+     * @returns  True if the selector matches by type, otherwise false.
+     */
     public get isSelectingByType(): boolean {
         return this.selector.startsWith(':');
     }
 
+    /**
+     * Checks if the selector matches by ID.
+     * @returns  True if the selector matches by ID, otherwise false.
+     */
     public get isSelectingById(): boolean {
         return this.selector.startsWith('#');
     }
@@ -167,12 +208,12 @@ export class PointcutSelector implements ClassFilter, MethodMatcher {
     /**
      * @inheritDoc
      */
-    public matches<T extends object = any>(method: Function, type: Type<T>): boolean;
+    public matches<T extends object = any>(method: Method, type: Type<T>): boolean;
 
     /**
      * @inheritDoc
      */
-    public matches<T extends object = any>(method: Function, type: Type<T>, args: Array<any>): boolean;
+    public matches<T extends object = any>(method: Method, type: Type<T>, args: Array<any>): boolean;
 
     /**
      * Determines if the given method matches the criteria defined by the
@@ -183,12 +224,11 @@ export class PointcutSelector implements ClassFilter, MethodMatcher {
      * @returns True if the method matches the criteria, otherwise false.
      */
     public matches<T extends object = any>(
-        method: Function,
+        method: Method,
         type: Type<T>,
         ...args: Array<any>
     ): boolean {
-        this.type = 'method';
-        if (this.selector === '*') {
+        if (this.isSelectingAll) {
             return true;
         }
         let machType: boolean = false;
@@ -217,6 +257,23 @@ export class PointcutSelector implements ClassFilter, MethodMatcher {
     }
 
     /**
+     * Determines the token type based on the selector.
+     * Sets the `tokenType` property to one of the `TokenType` values
+     * (`#`, `&`, `:`, `*`) or `null` if no match is found.
+     */
+    protected determineTokenType(): void {
+        if (this.isSelectingById) {
+            this.tokenType = '#';
+        } else if (this.isSelectingByInstance) {
+            this.tokenType = '&';
+        } else if (this.isSelectingByType) {
+            this.tokenType = ':';
+        } else if (this.isSelectingAll) {
+            this.tokenType = '*';
+        }
+    }
+
+    /**
      * Checks if the type is assignable from the specified type.
      * @param type The class to check against the selector.
      * @returns True if the type is assignable from the specified type, otherwise false.
@@ -232,8 +289,12 @@ export class PointcutSelector implements ClassFilter, MethodMatcher {
      * @param method The method to check against the matcher criteria.
      * @param type The class to check against the method.
      * @returns True if the method matches the criteria, otherwise false.
+     * @see Method
+     * @see Type
      */
-    protected isDeclaredMethod<T extends object = any>(method: Function, type: Type<T>): boolean {
+    protected isDeclaredMethod<T extends object = any>(
+        method: Method, type: Type<T>
+    ): boolean {
         let currentPrototype: any = type.prototype;
         while (currentPrototype) {
             if (Reflect.has(currentPrototype, method.name)) {
@@ -248,6 +309,7 @@ export class PointcutSelector implements ClassFilter, MethodMatcher {
      * Checks if the selector matches the ID of the given type.
      * @param type The class to check against the selector.
      * @returns True if the selector matches the ID, otherwise false.
+     * @see Type
      */
     protected matchId<T = any>(type: Type<T>): boolean {
         const id: string = this.selector.slice(1);
@@ -255,21 +317,25 @@ export class PointcutSelector implements ClassFilter, MethodMatcher {
     }
 
     /**
-     * The method selector matches methods based on the element
+     * The method selector matches methods or types based on the element
      * having a given attribute explicitly set, with options for defining an
      * attribute value or substring value match.
      *
-     * @param method The method to check against the matcher criteria.
-     * @returns True if the method matches the criteria, otherwise false.
+     * @param methodOrType The method or type to check against the
+     * matcher criteria.
+     * @returns True if the method or type matches the criteria, otherwise
+     * false.
+     * @see Method
+     * @see Type
      */
-    protected matchPointcut(method: Function): boolean {
+    protected matchPointcut(methodOrType: Method | Type): boolean {
         const regex: RegExp = /\[(\w+)([~|^$*]?=)?(".*?"|'.*?'|\w+)?([is]?)\]/;
         const match: RegExpMatchArray | null = this.selector.match(regex);
         if (!match) {
             return false;
         }
         const [, attr, operator, value, flag]: RegExpMatchArray = match;
-        const attrValue: any = Reflect.getMetadata(attr, method);
+        const attrValue: any = Reflect.getMetadata(attr, methodOrType);
         if (!attrValue) {
             return false;
         }
@@ -286,8 +352,8 @@ export class PointcutSelector implements ClassFilter, MethodMatcher {
                 Represents methods with an attribute name of attr whose value is exactly value.
                  */
                 return isCaseInsensitiveHtmlAttribute
-                    ? method.name.toLowerCase() === attrValue.toLowerCase()
-                    : method.name === attrValue;
+                    ? methodOrType.name.toLowerCase() === attrValue.toLowerCase()
+                    : methodOrType.name === attrValue;
             case '~=':
                 /*
                 [attr~=value]
@@ -299,7 +365,7 @@ export class PointcutSelector implements ClassFilter, MethodMatcher {
                     isCaseInsensitiveHtmlAttribute ? attrValue.toLowerCase() : attrValue
                 ).split(' ').some((part: string): boolean => (
                     part === (
-                        isCaseInsensitiveHtmlAttribute ? method.name.toLowerCase() : method.name
+                        isCaseInsensitiveHtmlAttribute ? methodOrType.name.toLowerCase() : methodOrType.name
                     )
                 ));
             case '|=':
@@ -310,15 +376,15 @@ export class PointcutSelector implements ClassFilter, MethodMatcher {
                 (U+0024).
                 */
                 if (isCaseInsensitiveHtmlAttribute) {
-                    if (method.name.toLowerCase() === attrValue.toLowerCase()) {
+                    if (methodOrType.name.toLowerCase() === attrValue.toLowerCase()) {
                         return true;
                     }
-                    return method.name.toLowerCase().startsWith(attrValue.toLowerCase() + '$');
+                    return methodOrType.name.toLowerCase().startsWith(attrValue.toLowerCase() + '$');
                 }
-                if (method.name === attrValue) {
+                if (methodOrType.name === attrValue) {
                     return true;
                 }
-                return method.name.startsWith(attrValue + '$');
+                return methodOrType.name.startsWith(attrValue + '$');
             case '^=':
                 /*
                 [attr^=value]
@@ -326,8 +392,8 @@ export class PointcutSelector implements ClassFilter, MethodMatcher {
                 is prefixed (preceded) by value.
                  */
                 return isCaseInsensitiveHtmlAttribute
-                    ? method.name.toLowerCase().startsWith(attrValue.toLowerCase())
-                    : method.name.startsWith(attrValue);
+                    ? methodOrType.name.toLowerCase().startsWith(attrValue.toLowerCase())
+                    : methodOrType.name.startsWith(attrValue);
             case '$=':
                 /*
                 [attr$=value]
@@ -335,8 +401,8 @@ export class PointcutSelector implements ClassFilter, MethodMatcher {
                 is suffixed (followed) by value.
                  */
                 return isCaseInsensitiveHtmlAttribute
-                    ? method.name.toLowerCase().endsWith(attrValue.toLowerCase())
-                    : method.name.endsWith(attrValue);
+                    ? methodOrType.name.toLowerCase().endsWith(attrValue.toLowerCase())
+                    : methodOrType.name.endsWith(attrValue);
             case '*=':
                 /*
                 [attr*=value]
@@ -344,8 +410,8 @@ export class PointcutSelector implements ClassFilter, MethodMatcher {
                 contains at least one occurrence of value within the string.
                  */
                 return isCaseInsensitiveHtmlAttribute
-                    ? method.name.toLowerCase().includes(attrValue.toLowerCase())
-                    : method.name.includes(attrValue);
+                    ? methodOrType.name.toLowerCase().includes(attrValue.toLowerCase())
+                    : methodOrType.name.includes(attrValue);
             default:
                 return !!attrValue;
         }
