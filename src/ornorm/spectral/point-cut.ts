@@ -127,26 +127,41 @@ export class PointcutSelector implements ClassFilter, MethodMatcher {
         return this.isStaticPointcut;
     }
 
+    public get isSelectingAll(): boolean {
+        return this.selector === '*';
+    }
+
+    public get isSelectingByInstance(): boolean {
+        return this.selector.startsWith('&');
+    }
+
+    public get isSelectingByType(): boolean {
+        return this.selector.startsWith(':');
+    }
+
+    public get isSelectingById(): boolean {
+        return this.selector.startsWith('#');
+    }
+
     /**
      * @inheritDoc
      */
     public filter<T = any>(type: Type<T>): boolean {
-        this.type = 'class';
-        if (this.selector === '*') {
-            return true;
+        if (this.isRuntime) {
+            if (this.isSelectingById) {
+                return this.matchId(type);
+            }
+            if (this.isSelectingByType) {
+                return this.matchType(type);
+            }
+            if (this.isSelectingByInstance) {
+                return this.isAssignableFrom(type);
+            }
+            if (this.isSelectingAll) {
+                return true;
+            }
         }
-        if (this.selector.startsWith('#')) {
-            return this.matchId(type);
-        }
-        if (this.selector.startsWith('&')) {
-            return this.isAssignableFrom(type);
-        }
-        if (this.selector.startsWith(':')) {
-            return this.matchType(type);
-        }
-        const machType: boolean = this.matchPointcut(type);
-
-        return machType;
+        return this.matchPointcut(type);
     }
 
     /**
@@ -181,12 +196,12 @@ export class PointcutSelector implements ClassFilter, MethodMatcher {
         if (this.isRuntime) {
             // Runtime pointcut: consider method arguments
             if (args.length >= 2) {
-                if (this.selector.startsWith('#')) {
+                if (this.isSelectingById) {
                     machType = this.matchId(type);
-                } else if (this.selector.startsWith('&')) {
-                    machType = this.isAssignableFrom(type);
-                } else if (this.selector.startsWith(':')) {
+                } else if (this.isSelectingByType) {
                     machType = this.matchType(type);
+                } else if (this.isSelectingByInstance) {
+                    machType = this.isAssignableFrom(type);
                 } else {
                     machType = this.isDeclaredMethod(method, type);
                 }
@@ -219,7 +234,14 @@ export class PointcutSelector implements ClassFilter, MethodMatcher {
      * @returns True if the method matches the criteria, otherwise false.
      */
     protected isDeclaredMethod<T extends object = any>(method: Function, type: Type<T>): boolean {
-        return Reflect.has(type.prototype, method.name);
+        let currentPrototype: any = type.prototype;
+        while (currentPrototype) {
+            if (Reflect.has(currentPrototype, method.name)) {
+                return true;
+            }
+            currentPrototype = Object.getPrototypeOf(currentPrototype);
+        }
+        return false;
     }
 
     /**
