@@ -1,4 +1,4 @@
-import {getParameterNames, JoinPoint} from '@spectral';
+import {getParameterNames, JoinPoint} from '@ornorm/spectral';
 
 /**
  * The type of advice that can be applied.

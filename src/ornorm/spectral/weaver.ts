@@ -9,7 +9,7 @@ import {
     Before,
     Disposable,
     PointcutConfig
-} from '@spectral';
+} from '@ornorm/spectral';
 
 /**
  * Class representing a factory for creating proxies.

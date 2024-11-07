@@ -1,4 +1,4 @@
-import {AdviceType} from '@spectral';
+import {AdviceType} from '@ornorm/spectral';
 
 /**
  * Represents the configuration for a pointcut.

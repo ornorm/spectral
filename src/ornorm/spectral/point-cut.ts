@@ -17,7 +17,7 @@
  * 3. This notice may not be removed or altered from any source distribution.
  */
 
-import {Type} from '@spectral';
+import {Type} from '@ornorm/spectral';
 
 /**
  * Type alias for a function that validates whether a given target matches
