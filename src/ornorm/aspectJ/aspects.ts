@@ -3,7 +3,10 @@ import {
     StructureKind,
     Scope,
     ClassDeclaration,
-    SourceFile
+    SourceFile,
+    MethodDeclarationStructure,
+    ConstructorDeclarationStructure,
+    PropertyDeclarationStructure
 } from 'ts-morph';
 
 /*
@@ -65,18 +68,61 @@ general form:
     [ Modifiers ] Type Type . Id [ = Expression ] ;
  */
 
+// Type Aliases for Method Shapes
+export type MethodForm1<T = any, R = any> = (value: T) => R;
+export type MethodForm2<T = any, R = any> = (value: T) => R;
+export type ConstructorForm<T = any> = new (...args: T[]) => T;
+export type PropertyForm<T = any> = T;
+
 // Create a new project using ts-morph
 const project: Project = new Project();
 // Add a new source file named Aspects.ts
 const sourceFile: SourceFile = project.createSourceFile('Aspects.ts', '', { overwrite: true });
 
 /**
- * Creates an aspect class with the specified properties.
+ * Validates and adds general inter-type forms to the aspect class.
+ * @param aspectClass - The aspect class to which the inter-type forms
+ * are added.
+ * @param members - The array of member declarations (methods,
+ * constructors, and fields) to add to the aspect.
+ */
+export function addInterTypeMember(
+    aspectClass: ClassDeclaration,
+    members: (MethodDeclarationStructure | ConstructorDeclarationStructure | PropertyDeclarationStructure)[]
+): void {
+    for (const member of members) {
+        if (member.kind === StructureKind.Method) {
+            // Validate against MethodForm1 and MethodForm2
+            if (typeof member.returnType === 'string' &&
+                member.returnType !== 'void' &&
+                (member.parameters?.length || 0) > 0
+            ) {
+                aspectClass.addMethod(member as MethodDeclarationStructure);
+            } else if (typeof member.returnType === 'string' && member.isAbstract) {
+                aspectClass.addMethod(member as MethodDeclarationStructure);
+            }
+        } else if (member.kind === StructureKind.Constructor) {
+            // Validate against ConstructorForm
+            if ((member.parameters?.length || 0) > 0) {
+                aspectClass.addConstructor(member as ConstructorDeclarationStructure);
+            }
+        } else if (member.kind === StructureKind.Property) {
+            // Validate against PropertyForm
+            if (typeof member.initializer === 'string' || typeof member.type === 'string') {
+                aspectClass.addProperty(member as PropertyDeclarationStructure);
+            }
+        }
+    }
+}
+
+/**
+ * Creates an aspect class with the specified properties and inter-type member declarations.
  * @param name - The name of the aspect class.
  * @param isPrivileged - Indicates if the aspect is privileged (can access private fields and methods).
  * @param extendsClass - The class that this aspect extends (if any).
  * @param implementsInterfaces - The interfaces that this aspect implements (if any).
  * @param perClause - The PerClause definition for the aspect (if any).
+ * @param members - The array of member declarations (methods, constructors, and fields) to add to the aspect.
  * @returns The created aspect class.
  * @see ClassDeclaration
  */
@@ -85,7 +131,8 @@ export function createAspectClass(
     isPrivileged: boolean,
     extendsClass?: string,
     implementsInterfaces?: string[],
-    perClause?: string
+    perClause?: string,
+    members?: (MethodDeclarationStructure | ConstructorDeclarationStructure | PropertyDeclarationStructure)[]
 ): ClassDeclaration {
     // Add a class declaration to the source file
     const aspectClass: ClassDeclaration = sourceFile.addClass({
@@ -134,6 +181,11 @@ export function createAspectClass(
         });
     }
 
+    // Add and validate general intertype forms
+    if (members) {
+        addInterTypeMember(aspectClass, members);
+    }
+
     return aspectClass;
 }
 
@@ -147,5 +199,5 @@ createAspectClass('IssingletonAspect', false, undefined, undefined, 'issingleton
 
 // Save the source file
 project.save().then(() => {
-    console.log('Aspects.ts has been created with various PerClause definitions');
+    console.log('Aspects.ts has been updated with validation and creation of intertypes');
 });
