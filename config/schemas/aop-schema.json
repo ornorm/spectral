@@ -246,6 +246,22 @@
             "arg-names": {
               "type": "string",
               "description": "Comma-delimited list of parameter names."
+            },
+            "before": {
+              "type": "string",
+              "description": "The method providing the body of the before advice."
+            },
+            "after": {
+              "type": "string",
+              "description": "The method providing the body of the after advice."
+            },
+            "afterReturning": {
+              "type": "string",
+              "description": "The method providing the body of the after returning advice."
+            },
+            "afterThrowing": {
+              "type": "string",
+              "description": "The method providing the body of the after throwing advice."
             }
           },
           "required": ["id", "method"]
