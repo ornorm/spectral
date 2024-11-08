@@ -16,8 +16,6 @@
     "paths": {
       "@ornorm": ["src/ornorm"],
       "@ornorm/*": ["src/ornorm/*"],
-      "@ornorm/aspectJ": ["src/ornorm/aspectJ"],
-      "@ornorm/aspectJ/*": ["src/ornorm/aspectJ/*"],
       "@ornorm/spectral": ["src/ornorm/spectral"],
       "@ornorm/spectral/*": ["src/ornorm/spectral/*"]
     }
