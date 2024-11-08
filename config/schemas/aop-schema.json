@@ -75,6 +75,21 @@
               }
             ]
           }
+        },
+        "propertyPath": {
+          "type": "object",
+          "description": "The property path to set on the bean.",
+          "properties": {
+            "id": {
+              "type": "string",
+              "description": "The unique identifier for the property path."
+            },
+            "path": {
+              "type": "string",
+              "description": "The path to the property."
+            }
+          },
+          "required": ["id", "path"]
         }
       },
       "required": ["id", "class"]
