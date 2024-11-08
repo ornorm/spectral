@@ -90,6 +90,28 @@
             }
           },
           "required": ["id", "path"]
+        },
+        "listFactory": {
+          "type": "object",
+          "description": "The list factory to set on the bean.",
+          "properties": {
+            "id": {
+              "type": "string",
+              "description": "The unique identifier for the list factory."
+            },
+            "sourceList": {
+              "type": "array",
+              "description": "The source list for the values.",
+              "items": {
+                "type": "string"
+              }
+            },
+            "listClass": {
+              "type": "string",
+              "description": "The class of the list to instantiate."
+            }
+          },
+          "required": ["id", "sourceList"]
         }
       },
       "required": ["id", "class"]
