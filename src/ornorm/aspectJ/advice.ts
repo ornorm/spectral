@@ -39,6 +39,15 @@ Object around () : call(int Foo.m(int)) { ... }
     same, but the value of proceed() is converted to an Integer, and
     the body should also return an Integer which will be converted
     into an int
+Special forms in advice
+thisJoinPoint
+    reflective information about the join point.
+thisJoinPointStaticPart
+    the equivalent of thisJoinPoint.getStaticPart(), but may use fewer resources.
+thisEnclosingJoinPointStaticPart
+    the static part of the join point enclosing this one.
+proceed (Arguments)
+    only available in around advice. The Arguments must be the same number and type as the parameters of the advice.
 */
 
 // Create a new project using ts-morph
@@ -92,9 +101,14 @@ const adviceClass: ClassDeclarationStructure = {
         createAdvice('afterCallMRegardless', 'after', '', 'call(int Foo.m(int))', `console.log('After Foo.m(int) regardless of exit');`),
         createAdvice('beforeSetX', 'before', 'int i', 'set(int Foo.x) && args(i)', `console.log('Before setting Foo.x to', i);`),
         createAdvice('beforeSetAnyField', 'before', 'Object o', 'set(* Foo.*) && args(o)', `console.log('Before setting any Foo field to', o);`),
-        createAdvice('aroundCallM', 'around', '', 'call(int Foo.m(int))', `console.log('Around calling Foo.m(int)'); return proceed();`),
-        createAdvice('aroundCallMThrowingIOException', 'around', '', 'call(int Foo.m(int))', `console.log('Around calling Foo.m(int) with possible IOException'); try { return proceed(); } catch (e) { throw e; }`),
-        createAdvice('aroundCallMReturningObject', 'around', '', 'call(int Foo.m(int))', `console.log('Around calling Foo.m(int) with Object return'); return proceed();`)
+        createAdvice('aroundCallM', 'around', '', 'call(int Foo.m(int))', `console.log('Around calling Foo.m(int) with thisJoinPoint:', thisJoinPoint);
+        console.log('Static part of this join point:', thisJoinPointStaticPart);
+        console.log('Static part of enclosing join point:', thisEnclosingJoinPointStaticPart);
+        return proceed();`),
+        createAdvice('aroundCallMThrowingIOException', 'around', '', 'call(int Foo.m(int))', `console.log('Around calling Foo.m(int) with possible IOException and thisJoinPoint:', thisJoinPoint);
+        try { return proceed(); } catch (e) { throw e; }`),
+        createAdvice('aroundCallMReturningObject', 'around', '', 'call(int Foo.m(int))', `console.log('Around calling Foo.m(int) with Object return and thisJoinPoint:', thisJoinPoint);
+        return proceed();`)
     ]
 };
 
@@ -103,5 +117,5 @@ sourceFile.addClass(adviceClass);
 
 // Save the source file
 project.save().then(() => {
-    console.log('advice.ts has been created with various advice declarations');
+    console.log('advice.ts has been created with various advice declarations including special forms');
 });
