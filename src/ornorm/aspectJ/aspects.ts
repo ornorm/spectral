@@ -9,6 +9,102 @@ import {
     Scope
 } from 'ts-morph';
 
+/*
+Aspects
+aspect A { … }
+    defines the aspect A
+privileged aspect A { … }
+    A can access private fields and methods
+aspect A extends B implements I, J { … }
+    B is a class or abstract aspect, I and J are interfaces
+aspect A percflow( call(void Foo.m()) ) { … }
+    an instance of A is instantiated for every control flow through
+    calls to m()
+general form:
+    [ privileged ] [ Modifiers ] aspect Id
+        [ extends Type ] [ implements TypeList ] [ PerClause ]
+            { Body }
+where PerClause is one of
+    pertarget ( Pointcut )
+    perthis ( Pointcut )
+    percflow ( Pointcut )
+    percflowbelow ( Pointcut )
+    pertypewithin( TypePattern )
+    issingleton ()
+ */
+/*
+Inter-type Member Declarations in aspects
+int Foo . m ( int i ) { ... }
+    a method int m(int) owned by Foo, visible anywhere in the
+    defining package. In the body, this refers to the instance of Foo,
+    not the aspect.
+private int Foo . m ( int i ) throws IOException { ... }
+    a method int m(int) that is declared to throw IOException, only
+    visible in the defining aspect. In the body, this refers to the
+    instance of Foo, not the aspect.
+abstract int Foo . m ( int i ) ;
+    an abstract method int m(int) owned by Foo
+Point . new ( int x, int y ) { ... }
+    a constructor owned by Point. In the body, this refers to the new
+    Point, not the aspect.
+private static int Point . x ;
+    a static int field named x owned by Point and visible only in the
+    declaring aspect
+private int Point . x = foo() ;
+    a non-static field initialized to the result of calling foo(). In the
+    initializer, this refers to the instance of Foo, not the aspect.
+general form:
+    [ Modifiers ] Type Type . Id ( Formals )
+        [ throws TypeList ] { Body }
+    abstract [ Modifiers ] Type Type . Id ( Formals )
+        [ throws TypeList ] ;
+    [ Modifiers ] Type . new ( Formals )
+        [ throws TypeList ] { Body }
+    [ Modifiers ] Type Type . Id [ = Expression ] ;
+ */
+/*
+Other Inter-type Declarations in aspects
+declare parents : C extends D;
+    declares that the superclass of C is D. This is only legal if D is
+    declared to extend the original superclass of C.
+declare parents : C implements I, J ;
+    C implements I and J
+declare warning : set(* Point.*) && !within(Point) : “bad set” ;
+    the compiler warns “bad set” if it finds a set to any field of
+    Point outside of the code for Point
+declare error : call(Singleton.new(..)) : “bad construction” ;
+    the compiler signals an error “bad construction” if it finds a call
+    to any constructor of Singleton
+declare soft : IOException : execution(Foo.new(..));
+    any IOException thrown from executions of the constructors of
+    Foo are wrapped in org.aspectj.SoftException
+declare precedence : Security, Logging, * ;
+    at each join point, advice from Security has precedence over
+    advice from Logging, which has precedence over other advice.
+declare @type: C : @SomeAnnotation;
+    declares the annotation “@SomeAnnotation” on the type C.
+declare @method: * C.foo*(..) : @SomeAnnotation;
+    declares the annotation “@SomeAnnotation” on all methods
+    declared in C starting with “foo”.
+declare @constructor: C.new(..) : @SomeAnnotation;
+    declares the annotation “@SomeAnnotation” on all constructors
+    declared in C.
+declare @field: * C.* : @SomeAnnotation;
+    declares the annotation “@SomeAnnotation” on all fields
+    declared in C.
+general form
+    declare parents : TypePat extends Type ;
+    declare parents : TypePat implements TypeList ;
+    declare warning : Pointcut : String ;
+    declare error : Pointcut : String ;
+    declare soft : Type : Pointcut ;
+    declare precedence : TypePatList ;
+    declare @type : TypePat : Annotation;
+    declare @method: MethodPat : Annotation;
+    declare @constructor: ConstructorPat : Annotation;
+    declare @field : FieldPat : Annotation;
+ */
+
 /**
  * Type alias for an abstract method form.
  * Represents an abstract method that takes a value of type T and returns a value of type R.
