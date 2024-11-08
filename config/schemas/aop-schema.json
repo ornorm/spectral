@@ -105,6 +105,43 @@
         }
       },
       "required": ["config"]
+    },
+    "declaringAspect": {
+      "type": "object",
+      "description": "Declaring an Aspect",
+      "properties": {
+        "aspect": {
+          "type": "object",
+          "description": "An aspect is a regular Java object defined as a bean in your Spring application context.",
+          "properties": {
+            "id": {
+              "type": "string",
+              "description": "The unique identifier for the aspect."
+            },
+            "ref": {
+              "type": "string",
+              "description": "Reference to the backing bean."
+            }
+          },
+          "required": ["id", "ref"]
+        },
+        "bean": {
+          "type": "object",
+          "description": "The bean that backs the aspect can be configured and dependency injected just like any other Spring bean.",
+          "properties": {
+            "id": {
+              "type": "string",
+              "description": "The unique identifier for the bean."
+            },
+            "class": {
+              "type": "string",
+              "description": "The class name of the bean."
+            }
+          },
+          "required": ["id", "class"]
+        }
+      },
+      "required": ["aspect", "bean"]
     }
   },
   "definitions": {
