@@ -457,19 +457,49 @@ export function declareError(
 }
 
 /**
+ * Represents a soft exception that wraps another exception.
+ * @see Error
+ */
+export class SoftException extends Error {
+    /**
+     * Constructs a new `SoftException` that wraps the given cause.
+     *
+     * @param cause - The original error that caused this exception.
+     */
+    constructor(cause: Error) {
+        super(cause.message);
+        this.name = 'SoftException';
+        this.stack = cause.stack;
+    }
+}
+
+/**
  * Declares that any exceptions of a specified type thrown from a pointcut
  * should be wrapped in a soft exception.
  *
+ * @param aspectClass - The `aspect` class.
  * @param exceptionType - The type of exception.
  * @param pointcut - The pointcut at which the exception should be wrapped.
  *
  * @example
  * declareSoft(aspectClass, 'IOException', 'execution(Foo.new(..))');
  */
-export function declareSoft(aspectClass: ClassDeclaration, exceptionType: string, pointcut: string): void {
+export function declareSoft(
+    aspectClass: ClassDeclaration, exceptionType: string, pointcut: string): void {
     aspectClass.addMethod({
         name: 'declareSoft',
-        statements: [`console.log('declare soft : ${exceptionType} : ${pointcut};');`],
+        statements: [
+            `try {`,
+            `    // Your code that might throw an exception`,
+            `} catch (e) {`,
+            `    if (e instanceof ${exceptionType}) {`,
+            `        throw new SoftException(e);`,
+            `    } else {`,
+            `        throw e;`,
+            `    }`,
+            `}`,
+            `console.log('declare soft : ${exceptionType} : ${pointcut};');`
+        ],
         returnType: 'void',
         kind: StructureKind.Method,
     });
