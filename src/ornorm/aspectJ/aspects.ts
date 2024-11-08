@@ -440,8 +440,8 @@ export function declareWarning(
  * @example
  * declareError('call(Singleton.new(..))', 'bad construction');
  */
-export function declareError(aspectClass: ClassDeclaration, pointcut: string, message: string): void {
-
+export function declareError(
+    aspectClass: ClassDeclaration, pointcut: string, message: string): void {
     aspectClass.addMethod({
         name: 'declareError',
         statements: [
