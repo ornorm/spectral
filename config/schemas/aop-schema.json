@@ -84,6 +84,29 @@
         }
       }
     },
+    "aspects": {
+      "type": "object",
+      "properties": {
+        "aspect": {
+          "type": "object",
+          "properties": {
+            "id": {
+              "type": "string",
+              "description": "The unique identifier for the aspect."
+            },
+            "ref": {
+              "type": "string",
+              "description": "Reference to the backing bean."
+            },
+            "aop-xml": {
+              "type": "string",
+              "description": "Path to the META-INF/aop.xml file."
+            }
+          },
+          "required": ["id", "ref", "aop-xml"]
+        }
+      }
+    },
     "schemaBasedAop": {
       "type": "object",
       "description": "Schema-based AOP Support",
