@@ -100,6 +100,16 @@ export type MethodForm<T = any, R = any> = (value: T) => R;
  * @template T - The type of the property.
  */
 export type PropertyForm<T = any> = T;
+/**
+ * Type alias for an array of member declarations.
+ * Represents an array that can contain method, constructor, or property
+ * declarations.
+ * @see MethodDeclarationStructure
+ * @see ConstructorDeclarationStructure
+ * @see PropertyDeclarationStructure
+ */
+export type MemberDeclarationsArray = Array<MethodDeclarationStructure | ConstructorDeclarationStructure | PropertyDeclarationStructure>;
+
 
 // Create a new project using ts-morph
 const project: Project = new Project();
@@ -112,14 +122,10 @@ const sourceFile: SourceFile = project.createSourceFile('Aspects.ts', '', { over
  * forms are added.
  * @param members - The array of member declarations (methods,
  * constructors, and fields) to add to the aspect.
- * @see ClassDeclaration
- * @see MethodDeclarationStructure
- * @see ConstructorDeclarationStructure
- * @see PropertyDeclarationStructure
+ * @see MemberDeclarationsArray
  */
 export function addInterTypeMember(
-    aspectClass: ClassDeclaration,
-    members: Array<MethodDeclarationStructure | ConstructorDeclarationStructure | PropertyDeclarationStructure>
+    aspectClass: ClassDeclaration, members: MemberDeclarationsArray
 ): void {
     for (const member of members) {
         if (member.kind === StructureKind.Method) {
@@ -160,17 +166,15 @@ export function addInterTypeMember(
  * constructors, and fields) to add to the aspect.
  * @returns The created aspect class.
  * @see ClassDeclaration
- * @see MethodDeclarationStructure
- * @see ConstructorDeclarationStructure
- * @see PropertyDeclarationStructure
+ * @see MemberDeclarationsArray
  */
 export function createAspectClass(
     name: string,
     isPrivileged: boolean,
     extendsClass?: string,
-    implementsInterfaces?: string[],
+    implementsInterfaces?: Array<string>,
     perClause?: string,
-    members?: Array<MethodDeclarationStructure | ConstructorDeclarationStructure | PropertyDeclarationStructure>
+    members?: MemberDeclarationsArray
 ): ClassDeclaration {
     // Add a class declaration to the source file
     const aspectClass: ClassDeclaration = sourceFile.addClass({
