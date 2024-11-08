@@ -188,6 +188,10 @@
             "method": {
               "type": "string",
               "description": "The method providing the body of the advice."
+            },
+            "returning": {
+              "type": "string",
+              "description": "The name of the parameter to which the return value should be passed."
             }
           },
           "required": ["id", "method"]
