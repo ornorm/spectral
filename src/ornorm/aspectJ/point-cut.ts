@@ -3,7 +3,7 @@ import {
     StructureKind,
     Scope,
     MethodDeclarationStructure,
-    SourceFile, FunctionDeclarationStructure
+    SourceFile
 } from 'ts-morph';
 
 /*
@@ -29,25 +29,25 @@ const project: Project = new Project();
 const sourceFile: SourceFile = project.createSourceFile('point-cut.ts', '', { overwrite: true });
 
 /**
- * Creates a pointcut definition function.
+ * Creates a pointcut definition method.
  * @param name - The name of the pointcut.
  * @param visibility - The visibility of the pointcut (private, package, public, abstract).
  * @param formals - The formal parameters of the pointcut.
  * @param pointcut - The pointcut expression.
- * @returns The created pointcut function.
+ * @returns The created pointcut method.
  */
-export function createPointcut(
+function createPointcut(
     name: string,
     visibility: 'private' | 'package' | 'public' | 'abstract',
     formals: string,
     pointcut: string
-): FunctionDeclarationStructure {
+): MethodDeclarationStructure {
     return {
         name: name,
         parameters: formals ? formals.split(',').map(param => ({ name: param.trim() })) : [],
         statements: [],
         returnType: 'void',
-        isExported: visibility === 'public',
+        scope: visibility === 'private' ? Scope.Private : Scope.Public,
         isAbstract: visibility === 'abstract',
         decorators: [
             {
@@ -56,15 +56,15 @@ export function createPointcut(
                 kind: StructureKind.Decorator
             }
         ],
-        kind: StructureKind.Function
+        kind: StructureKind.Method
     };
 }
 
 // Add pointcut definitions to the source file
-sourceFile.addFunction(createPointcut('pc', 'private', '', 'call(void Foo.m())'));
-sourceFile.addFunction(createPointcut('pc', 'package', 'int i', 'set(int Foo.x) && args(i)'));
-sourceFile.addFunction(createPointcut('pc', 'public', '', ''));
-sourceFile.addFunction(createPointcut('pc', 'abstract', 'Object o', ''));
+sourceFile.addMethod(createPointcut('pc', 'private', '', 'call(void Foo.m())'));
+sourceFile.addMethod(createPointcut('pc', 'package', 'int i', 'set(int Foo.x) && args(i)'));
+sourceFile.addMethod(createPointcut('pc', 'public', '', ''));
+sourceFile.addMethod(createPointcut('pc', 'abstract', 'Object o', ''));
 
 // Save the source file
 project.save().then(() => {
