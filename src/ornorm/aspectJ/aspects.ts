@@ -6,7 +6,7 @@ import {
     MethodDeclarationStructure,
     ConstructorDeclarationStructure,
     PropertyDeclarationStructure,
-    Scope
+    Scope, ExpressionWithTypeArguments
 } from 'ts-morph';
 
 /*
@@ -359,15 +359,57 @@ export function isLegalInheritance(className: string, superClassName: string): b
  * @param interfaces - The interfaces that the class implements.
  *
  * @example
- * declareParentsImplements('C', ['I', 'J']);
+ * declareParentsImplements(aspectClass, 'C', ['I', 'J']);
  */
-export function declareParentsImplements(aspectClass: ClassDeclaration, className: string, interfaces: string[]): void {
+export function declareParentsImplements(
+    aspectClass: ClassDeclaration, className: string, interfaces: Array<string>): void {
+    // Add method to aspect class
     aspectClass.addMethod({
         name: 'declareParentsImplements',
-        statements: [`console.log('declare parents : ${className} implements ${interfaces.join(', ')};');`],
+        statements: [
+            // Check if the class implements the interfaces
+            `if (!areInterfacesImplemented('${className}', ${JSON.stringify(interfaces)})) {`,
+            `    throw new Error('Implementation is not legal: ${className} cannot implement ${interfaces.join(', ')}');`,
+            `}`,
+            // Log the declaration that class className implements interfaces
+            `console.log('declare parents : ${className} implements ${interfaces.join(', ')};');`
+        ],
         returnType: 'void',
         kind: StructureKind.Method,
     });
+}
+
+/**
+ * Checks if the class implements the given interfaces.
+ *
+ * @param className The name of the class.
+ * @param interfaces The interfaces that the class should implement.
+ * @returns  Returns true if the class implements the interfaces, false
+ * otherwise.
+ * @throws ReferenceError if the class is not found.
+ */
+function areInterfacesImplemented(
+    className: string, interfaces: Array<string>): boolean {
+    const project = new Project();
+    const sourceFiles: Array<SourceFile> = project.getSourceFiles();
+    let classDeclaration: ClassDeclaration | undefined;
+    // Find class declaration
+    sourceFiles.forEach((sourceFile: SourceFile) => {
+        const classDecl: ClassDeclaration | undefined =
+            sourceFile.getClass(className);
+        if (classDecl) classDeclaration = classDecl;
+    });
+    if (!classDeclaration) {
+        throw new ReferenceError(`Class ${className} not found.`);
+    }
+    // Get implemented interfaces of the class
+    const implementedInterfaces: Array<string> =
+        classDeclaration.getImplements().map(
+            (impl: ExpressionWithTypeArguments) => impl.getText());
+    // Check if all given interfaces are implemented by the class
+    return interfaces.every(
+        (interfaceName: string) =>
+            implementedInterfaces.includes(interfaceName));
 }
 
 /**
