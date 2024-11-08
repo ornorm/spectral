@@ -70,6 +70,60 @@ export type AdviceConfig = {
 };
 
 /**
+ * Represents the configuration for an advisor.
+ */
+export type AdvisorConfig = {
+    /**
+     * The unique identifier for the advisor.
+     */
+    id: string;
+    /**
+     * The advice configuration associated with the advisor.
+     * @see AdviceConfig
+     */
+    advice: AdviceConfig;
+    /**
+     * The pointcut configuration associated with the advisor.
+     * Can be either a class filter or a method matcher.
+     * @see ClassFilterConfig
+     * @see MethodMatcherConfig
+     */
+    pointcut: ClassFilterConfig | MethodMatcherConfig;
+};
+
+/**
+ * Represents the configuration for a class filter.
+ */
+export type ClassFilterConfig = {
+    /**
+     * The unique identifier for the class filter.
+     */
+    id: string;
+    /**
+     * The class name pattern to match.
+     */
+    pattern: string;
+};
+
+/**
+ * Represents the configuration for a method matcher.
+ */
+export type MethodMatcherConfig = {
+    /**
+     * The unique identifier for the method matcher.
+     */
+    id: string;
+    /**
+     * Flag to indicate if the method matcher is evaluated at runtime.
+     */
+    isRuntime: boolean;
+    /**
+     * The pattern to match method names.
+     */
+    pattern: string;
+};
+
+/**
  * Represents the configuration for an aspect.
  */
 export type AspectConfig = {
@@ -111,6 +165,11 @@ export type AopConfig = {
      * @see AspectConfig
      */
     aspects: Array<AspectConfig>;
+    /**
+     * The advisors defined in the configuration.
+     * @see AdvisorConfig
+     */
+    advisors?: Array<AdvisorConfig>;
     /**
      * Flag to indicate if CGLIB proxies should be used.
      */

@@ -53,6 +53,50 @@
         "required": ["id", "ref", "advices"]
       }
     },
+    "advisors": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "string" },
+          "advice": {
+            "type": "object",
+            "properties": {
+              "type": { "type": "string" },
+              "pointcutRef": { "type": "string" },
+              "pointcut": { "type": "string" },
+              "method": { "type": "string" },
+              "returning": { "type": "string" },
+              "throwing": { "type": "string" },
+              "argNames": { "type": "string" }
+            },
+            "required": ["type", "method"]
+          },
+          "pointcut": {
+            "oneOf": [
+              {
+                "type": "object",
+                "properties": {
+                  "id": { "type": "string" },
+                  "pattern": { "type": "string" }
+                },
+                "required": ["id", "pattern"]
+              },
+              {
+                "type": "object",
+                "properties": {
+                  "id": { "type": "string" },
+                  "isRuntime": { "type": "boolean" },
+                  "pattern": { "type": "string" }
+                },
+                "required": ["id", "isRuntime", "pattern"]
+              }
+            ]
+          }
+        },
+        "required": ["id", "advice", "pointcut"]
+      }
+    },
     "proxyTargetClass": { "type": "boolean" },
     "useAspectJ": { "type": "boolean" },
     "frozen": { "type": "boolean" },

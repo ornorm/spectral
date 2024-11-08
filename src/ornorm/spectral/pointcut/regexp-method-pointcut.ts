@@ -32,8 +32,8 @@ export class RegexpMethodPointcut implements MethodMatcher {
      * @param patterns An array of string patterns to be converted to
      * regular expressions.
      */
-    constructor(patterns: Array<string>) {
-        this.patterns = patterns.map((
+    constructor(patterns: string | Array<string>) {
+        this.patterns = (!Array.isArray(patterns) ? [patterns] : patterns).map((
             pattern: string): RegExp => new RegExp(pattern));
     }
 
