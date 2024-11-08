@@ -156,6 +156,135 @@ export type PropertyForm<T = any> = T;
  */
 export type MemberDeclarationsArray = Array<MethodDeclarationStructure | ConstructorDeclarationStructure | PropertyDeclarationStructure>;
 
+/**
+ * Declares that the superclass of a given class is another class.
+ *
+ * @param className - The name of the class whose superclass is being declared.
+ * @param superClassName - The name of the superclass.
+ *
+ * @example
+ * declareParents('C', 'D');
+ */
+export function declareParentsExtends(className: string, superClassName: string): void {
+    console.log(`declare parents : ${className} extends ${superClassName};`);
+}
+
+/**
+ * Declares that a given class implements one or more interfaces.
+ *
+ * @param className - The name of the class.
+ * @param interfaces - The interfaces that the class implements.
+ *
+ * @example
+ * declareParentsImplements('C', ['I', 'J']);
+ */
+export function declareParentsImplements(className: string, interfaces: string[]): void {
+    console.log(`declare parents : ${className} implements ${interfaces.join(', ')};`);
+}
+
+/**
+ * Declares a compiler warning for a specified pointcut.
+ *
+ * @param pointcut - The pointcut at which the warning should be issued.
+ * @param message - The warning message.
+ *
+ * @example
+ * declareWarning('set(* Point.*) && !within(Point)', 'bad set');
+ */
+export function declareWarning(pointcut: string, message: string): void {
+    console.log(`declare warning : ${pointcut} : "${message}";`);
+}
+
+/**
+ * Declares a compiler error for a specified pointcut.
+ *
+ * @param pointcut - The pointcut at which the error should be issued.
+ * @param message - The error message.
+ *
+ * @example
+ * declareError('call(Singleton.new(..))', 'bad construction');
+ */
+export function declareError(pointcut: string, message: string): void {
+    console.log(`declare error : ${pointcut} : "${message}";`);
+}
+
+/**
+ * Declares that any exceptions of a specified type thrown from a pointcut
+ * should be wrapped in a soft exception.
+ *
+ * @param exceptionType - The type of exception.
+ * @param pointcut - The pointcut at which the exception should be wrapped.
+ *
+ * @example
+ * declareSoft('IOException', 'execution(Foo.new(..))');
+ */
+export function declareSoft(exceptionType: string, pointcut: string): void {
+    console.log(`declare soft : ${exceptionType} : ${pointcut};`);
+}
+
+/**
+ * Declares the precedence of aspects at each join point.
+ *
+ * @param aspects - The list of aspects in order of precedence.
+ *
+ * @example
+ * declarePrecedence(['Security', 'Logging', '*']);
+ */
+export function declarePrecedence(aspects: string[]): void {
+    console.log(`declare precedence : ${aspects.join(', ')};`);
+}
+
+/**
+ * Declares an annotation on a specified type.
+ *
+ * @param type - The type to be annotated.
+ * @param annotation - The annotation to be declared.
+ *
+ * @example
+ * declareTypeAnnotation('C', '@SomeAnnotation');
+ */
+export function declareTypeAnnotation(type: string, annotation: string): void {
+    console.log(`declare @type: ${type} : ${annotation};`);
+}
+
+/**
+ * Declares an annotation on all methods matching a specified pattern.
+ *
+ * @param methodPattern - The method pattern to be annotated.
+ * @param annotation - The annotation to be declared.
+ *
+ * @example
+ * declareMethodAnnotation('* C.foo*(..)', '@SomeAnnotation');
+ */
+export function declareMethodAnnotation(methodPattern: string, annotation: string): void {
+    console.log(`declare @method: ${methodPattern} : ${annotation};`);
+}
+
+/**
+ * Declares an annotation on all constructors matching a specified pattern.
+ *
+ * @param constructorPattern - The constructor pattern to be annotated.
+ * @param annotation - The annotation to be declared.
+ *
+ * @example
+ * declareConstructorAnnotation('C.new(..)', '@SomeAnnotation');
+ */
+export function declareConstructorAnnotation(constructorPattern: string, annotation: string): void {
+    console.log(`declare @constructor: ${constructorPattern} : ${annotation};`);
+}
+
+/**
+ * Declares an annotation on all fields matching a specified pattern.
+ *
+ * @param fieldPattern - The field pattern to be annotated.
+ * @param annotation - The annotation to be declared.
+ *
+ * @example
+ * declareFieldAnnotation('* C.*', '@SomeAnnotation');
+ */
+export function declareFieldAnnotation(fieldPattern: string, annotation: string): void {
+    console.log(`declare @field: ${fieldPattern} : ${annotation};`);
+}
 
 // Create a new project using ts-morph
 const project: Project = new Project();
