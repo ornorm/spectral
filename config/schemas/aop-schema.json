@@ -48,44 +48,127 @@
     }
   },
   "$defs": {
-    "beans": {
+    "advice": {
       "type": "object",
       "properties": {
-        "bean": {
-          "type": "array",
-          "items": {
-            "$ref": "#/$defs/bean"
-          }
+        "id": {
+          "type": "string",
+          "description": "The unique identifier for the advice."
+        },
+        "pointcut-ref": {
+          "type": "string",
+          "description": "Reference to a named pointcut."
+        },
+        "pointcut": {
+          "type": "string",
+          "description": "Inline pointcut expression."
+        },
+        "method": {
+          "type": "string",
+          "description": "The method providing the body of the advice."
+        },
+        "returning": {
+          "type": "string",
+          "description": "The name of the parameter to which the return value should be passed."
+        },
+        "throwing": {
+          "type": "string",
+          "description": "The name of the parameter to which the thrown exception should be passed."
+        },
+        "finally": {
+          "type": "string",
+          "description": "The method providing the body of the after (finally) advice."
+        },
+        "around": {
+          "type": "string",
+          "description": "The method providing the body of the around advice."
+        },
+        "arg-names": {
+          "type": "string",
+          "description": "Comma-delimited list of parameter names."
+        },
+        "before": {
+          "type": "string",
+          "description": "The method providing the body of the before advice."
+        },
+        "after": {
+          "type": "string",
+          "description": "The method providing the body of the after advice."
+        },
+        "afterReturning": {
+          "type": "string",
+          "description": "The method providing the body of the after returning advice."
+        },
+        "afterThrowing": {
+          "type": "string",
+          "description": "The method providing the body of the after throwing advice."
         }
       },
-      "required": ["bean"]
+      "required": ["id", "method"]
     },
-    "context": {
+    "adviceOrdering": {
       "type": "object",
+      "description": "Advice Ordering",
       "properties": {
-        "component-scan": {
-          "$ref": "#/$defs/componentScan"
+        "order": {
+          "type": "string",
+          "description": "The order in which advice methods are declared within the enclosing <aop:aspect> element."
         },
-        "annotation-config": {
-          "type": "boolean",
-          "description": "Enable annotation-driven configuration."
-        },
-        "property-placeholder": {
-          "$ref": "#/$defs/propertyPlaceholder"
-        },
-        "load-time-weaver": {
-          "$ref": "#/$defs/loadTimeWeaver"
-        },
-        "spring-configured": {
-          "type": "object",
-          "description": "Enable AspectJ to dependency inject domain objects with Spring."
-        },
-        "mbean-export": {
-          "type": "object",
-          "description": "Enable annotation-based MBean export."
+        "precedence": {
+          "type": "string",
+          "description": "The precedence between aspects is determined via the order attribute in the <aop:aspect> element or by using the @Order annotation."
         }
       },
-      "required": ["component-scan", "annotation-config", "property-placeholder", "load-time-weaver", "spring-configured", "mbean-export"]
+      "required": ["order", "precedence"]
+    },
+    "adviceParameters": {
+      "type": "object",
+      "description": "Advice Parameters",
+      "properties": {
+        "pointcut": {
+          "type": "string",
+          "description": "Pointcut expressions and advice kinds."
+        },
+        "advisor": {
+          "type": "string",
+          "description": "Advisor elements within <aop:config>."
+        },
+        "aspect": {
+          "type": "string",
+          "description": "Aspect elements within <aop:config>."
+        },
+        "arg-names": {
+          "type": "string",
+          "description": "Comma-delimited list of parameter names."
+        }
+      },
+      "required": ["pointcut", "advisor", "aspect", "arg-names"]
+    },
+    "advisor": {
+      "type": "object",
+      "description": "Advisors",
+      "properties": {
+        "advisor": {
+          "type": "object",
+          "description": "The concept of 'advisors' comes from the AOP support defined in Spring and does not have a direct equivalent in AspectJ.",
+          "properties": {
+            "pointcut-ref": {
+              "type": "string",
+              "description": "Reference to a named pointcut."
+            },
+            "advice-ref": {
+              "type": "string",
+              "description": "Reference to the advice bean."
+            },
+            "order": {
+              "type": "string",
+              "description": "The order attribute to define the Ordered value of the advisor."
+            }
+          },
+          "required": ["pointcut-ref", "advice-ref"]
+        }
+      },
+      "required": ["advisor"]
     },
     "aop": {
       "type": "object",
@@ -114,110 +197,53 @@
         }
       }
     },
-    "aspects": {
+    "aspect": {
       "type": "object",
       "properties": {
-        "aspect": {
-          "$ref": "#/$defs/aspect"
-        }
-      }
-    },
-    "schemaBasedAop": {
-      "type": "object",
-      "description": "Schema-based AOP Support",
-      "properties": {
-        "config": {
-          "type": "object",
-          "description": "Within your Spring configurations, all aspect and advisor elements must be placed within an <aop:config> element.",
-          "properties": {
-            "pointcut": {
-              "type": "string",
-              "description": "Pointcut expressions and advice kinds."
-            },
-            "advisor": {
-              "type": "string",
-              "description": "Advisor elements within <aop:config>."
-            },
-            "aspect": {
-              "type": "string",
-              "description": "Aspect elements within <aop:config>."
-            }
+        "id": {
+          "type": "string",
+          "description": "The unique identifier for the aspect."
+        },
+        "privileged": {
+          "type": "boolean",
+          "description": "Indicates if the aspect is privileged."
+        },
+        "modifiers": {
+          "type": "array",
+          "items": {
+            "type": "string"
           },
-          "required": ["pointcut", "advisor", "aspect"]
-        }
-      },
-      "required": ["config"]
-    },
-    "declaringAspect": {
-      "type": "object",
-      "description": "Declaring an Aspect",
-      "properties": {
-        "aspect": {
-          "$ref": "#/$defs/aspect"
+          "description": "Modifiers for the aspect."
         },
-        "bean": {
-          "$ref": "#/$defs/bean"
-        }
-      },
-      "required": ["aspect", "bean"]
-    },
-    "declaringPointcut": {
-      "type": "object",
-      "description": "Declaring a Pointcut",
-      "properties": {
-        "pointcut": {
-          "$ref": "#/$defs/pointcut"
-        }
-      },
-      "required": ["pointcut"]
-    },
-    "declaringAdvice": {
-      "type": "object",
-      "description": "Declaring Advice",
-      "properties": {
-        "advice": {
-          "$ref": "#/$defs/advice"
-        }
-      },
-      "required": ["advice"]
-    },
-    "adviceParameters": {
-      "type": "object",
-      "description": "Advice Parameters",
-      "properties": {
-        "pointcut": {
+        "extends": {
           "type": "string",
-          "description": "Pointcut expressions and advice kinds."
+          "description": "The class or abstract aspect that this aspect extends."
         },
-        "advisor": {
-          "type": "string",
-          "description": "Advisor elements within <aop:config>."
+        "implements": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Interfaces that this aspect implements."
         },
-        "aspect": {
+        "perClause": {
           "type": "string",
-          "description": "Aspect elements within <aop:config>."
+          "enum": [
+            "pertarget",
+            "perthis",
+            "percflow",
+            "percflowbelow",
+            "pertypewithin",
+            "issingleton"
+          ],
+          "description": "The per-clause defining the aspect instantiation model."
         },
-        "arg-names": {
+        "body": {
           "type": "string",
-          "description": "Comma-delimited list of parameter names."
+          "description": "The body of the aspect."
         }
       },
-      "required": ["pointcut", "advisor", "aspect", "arg-names"]
-    },
-    "adviceOrdering": {
-      "type": "object",
-      "description": "Advice Ordering",
-      "properties": {
-        "order": {
-          "type": "string",
-          "description": "The order in which advice methods are declared within the enclosing <aop:aspect> element."
-        },
-        "precedence": {
-          "type": "string",
-          "description": "The precedence between aspects is determined via the order attribute in the <aop:aspect> element or by using the @Order annotation."
-        }
-      },
-      "required": ["order", "precedence"]
+      "required": ["id", "body"]
     },
     "aspectInstantiationModels": {
       "type": "object",
@@ -230,67 +256,13 @@
       },
       "required": ["singleton"]
     },
-    "advisors": {
+    "aspects": {
       "type": "object",
-      "description": "Advisors",
       "properties": {
-        "advisor": {
-          "type": "object",
-          "description": "The concept of 'advisors' comes from the AOP support defined in Spring and does not have a direct equivalent in AspectJ.",
-          "properties": {
-            "pointcut-ref": {
-              "type": "string",
-              "description": "Reference to a named pointcut."
-            },
-            "advice-ref": {
-              "type": "string",
-              "description": "Reference to the advice bean."
-            },
-            "order": {
-              "type": "string",
-              "description": "The order attribute to define the Ordered value of the advisor."
-            }
-          },
-          "required": ["pointcut-ref", "advice-ref"]
+        "aspect": {
+          "$ref": "#/$defs/aspect"
         }
-      },
-      "required": ["advisor"]
-    },
-    "mixingAspectTypes": {
-      "type": "object",
-      "description": "Mixing Aspect Types",
-      "properties": {
-        "description": {
-          "type": "string",
-          "description": "It is perfectly possible to mix @AspectJ style aspects by using the auto-proxying support, schema-defined <aop:aspect> aspects, <aop:advisor> declared advisors, and even proxies and interceptors in other styles in the same configuration."
-        }
-      },
-      "required": ["description"]
-    },
-    "choosingAopDeclarationStyle": {
-      "type": "object",
-      "description": "Choosing which AOP Declaration Style to Use",
-      "properties": {
-        "proxyingMechanisms": {
-          "type": "object",
-          "properties": {
-            "jdkDynamicProxies": {
-              "type": "string",
-              "description": "Spring AOP uses either JDK dynamic proxies or CGLIB to create the proxy for a given target object. If the target object to be proxied implements at least one interface, a JDK dynamic proxy is used."
-            },
-            "cglibProxies": {
-              "type": "string",
-              "description": "If the target object does not implement any interfaces, a CGLIB proxy is created. To force the use of CGLIB proxies, set the value of the proxy-target-class attribute of the <aop:config> element to true."
-            },
-            "proxyTargetClass": {
-              "type": "string",
-              "description": "Using proxy-target-class=\"true\" on <tx:annotation-driven/>, <aop:aspectj-autoproxy/>, or <aop:config/> elements forces the use of CGLIB proxies for all three of them."
-            }
-          },
-          "required": ["jdkDynamicProxies", "cglibProxies", "proxyTargetClass"]
-        }
-      },
-      "required": ["proxyingMechanisms"]
+      }
     },
     "bean": {
       "type": "object",
@@ -435,6 +407,103 @@
       },
       "required": ["id", "class"]
     },
+    "beans": {
+      "type": "object",
+      "properties": {
+        "bean": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/bean"
+          }
+        }
+      },
+      "required": ["bean"]
+    },
+    "choosingAopDeclarationStyle": {
+      "type": "object",
+      "description": "Choosing which AOP Declaration Style to Use",
+      "properties": {
+        "proxyingMechanisms": {
+          "type": "object",
+          "properties": {
+            "jdkDynamicProxies": {
+              "type": "string",
+              "description": "Spring AOP uses either JDK dynamic proxies or CGLIB to create the proxy for a given target object. If the target object to be proxied implements at least one interface, a JDK dynamic proxy is used."
+            },
+            "cglibProxies": {
+              "type": "string",
+              "description": "If the target object does not implement any interfaces, a CGLIB proxy is created. To force the use of CGLIB proxies, set the value of the proxy-target-class attribute of the <aop:config> element to true."
+            },
+            "proxyTargetClass": {
+              "type": "string",
+              "description": "Using proxy-target-class=\"true\" on <tx:annotation-driven/>, <aop:aspectj-autoproxy/>, or <aop:config/> elements forces the use of CGLIB proxies for all three of them."
+            }
+          },
+          "required": ["jdkDynamicProxies", "cglibProxies", "proxyTargetClass"]
+        }
+      },
+      "required": ["proxyingMechanisms"]
+    },
+    "context": {
+      "type": "object",
+      "properties": {
+        "component-scan": {
+          "$ref": "#/$defs/componentScan"
+        },
+        "annotation-config": {
+          "type": "boolean",
+          "description": "Enable annotation-driven configuration."
+        },
+        "property-placeholder": {
+          "$ref": "#/$defs/propertyPlaceholder"
+        },
+        "load-time-weaver": {
+          "$ref": "#/$defs/loadTimeWeaver"
+        },
+        "spring-configured": {
+          "type": "object",
+          "description": "Enable AspectJ to dependency inject domain objects with Spring."
+        },
+        "mbean-export": {
+          "type": "object",
+          "description": "Enable annotation-based MBean export."
+        }
+      },
+      "required": ["component-scan", "annotation-config", "property-placeholder", "load-time-weaver", "spring-configured", "mbean-export"]
+    },
+    "declaringAdvice": {
+      "type": "object",
+      "description": "Declaring Advice",
+      "properties": {
+        "advice": {
+          "$ref": "#/$defs/advice"
+        }
+      },
+      "required": ["advice"]
+    },
+    "declaringAspect": {
+      "type": "object",
+      "description": "Declaring an Aspect",
+      "properties": {
+        "aspect": {
+          "$ref": "#/$defs/aspect"
+        },
+        "bean": {
+          "$ref": "#/$defs/bean"
+        }
+      },
+      "required": ["aspect", "bean"]
+    },
+    "declaringPointcut": {
+      "type": "object",
+      "description": "Declaring a Pointcut",
+      "properties": {
+        "pointcut": {
+          "$ref": "#/$defs/pointcut"
+        }
+      },
+      "required": ["pointcut"]
+    },
     "meta": {
       "type": "object",
       "properties": {
@@ -449,111 +518,16 @@
       },
       "required": ["key", "value"]
     },
-    "aspect": {
+    "mixingAspectTypes": {
       "type": "object",
+      "description": "Mixing Aspect Types",
       "properties": {
-        "id": {
+        "description": {
           "type": "string",
-          "description": "The unique identifier for the aspect."
-        },
-        "privileged": {
-          "type": "boolean",
-          "description": "Indicates if the aspect is privileged."
-        },
-        "modifiers": {
-          "type": "array",
-          "items": {
-            "type": "string"
-          },
-          "description": "Modifiers for the aspect."
-        },
-        "extends": {
-          "type": "string",
-          "description": "The class or abstract aspect that this aspect extends."
-        },
-        "implements": {
-          "type": "array",
-          "items": {
-            "type": "string"
-          },
-          "description": "Interfaces that this aspect implements."
-        },
-        "perClause": {
-          "type": "string",
-          "enum": [
-            "pertarget",
-            "perthis",
-            "percflow",
-            "percflowbelow",
-            "pertypewithin",
-            "issingleton"
-          ],
-          "description": "The per-clause defining the aspect instantiation model."
-        },
-        "body": {
-          "type": "string",
-          "description": "The body of the aspect."
+          "description": "It is perfectly possible to mix @AspectJ style aspects by using the auto-proxying support, schema-defined <aop:aspect> aspects, <aop:advisor> declared advisors, and even proxies and interceptors in other styles in the same configuration."
         }
       },
-      "required": ["id", "body"]
-    },
-    "advice": {
-      "type": "object",
-      "properties": {
-        "id": {
-          "type": "string",
-          "description": "The unique identifier for the advice."
-        },
-        "pointcut-ref": {
-          "type": "string",
-          "description": "Reference to a named pointcut."
-        },
-        "pointcut": {
-          "type": "string",
-          "description": "Inline pointcut expression."
-        },
-        "method": {
-          "type": "string",
-          "description": "The method providing the body of the advice."
-        },
-        "returning": {
-          "type": "string",
-          "description": "The name of the parameter to which the return value should be passed."
-        },
-        "throwing": {
-          "type": "string",
-          "description": "The name of the parameter to which the thrown exception should be passed."
-        },
-        "finally": {
-          "type": "string",
-          "description": "The method providing the body of the after (finally) advice."
-        },
-        "around": {
-          "type": "string",
-          "description": "The method providing the body of the around advice."
-        },
-        "arg-names": {
-          "type": "string",
-          "description": "Comma-delimited list of parameter names."
-        },
-        "before": {
-          "type": "string",
-          "description": "The method providing the body of the before advice."
-        },
-        "after": {
-          "type": "string",
-          "description": "The method providing the body of the after advice."
-        },
-        "afterReturning": {
-          "type": "string",
-          "description": "The method providing the body of the after returning advice."
-        },
-        "afterThrowing": {
-          "type": "string",
-          "description": "The method providing the body of the after throwing advice."
-        }
-      },
-      "required": ["id", "method"]
+      "required": ["description"]
     },
     "pointcut": {
       "type": "object",
@@ -569,6 +543,32 @@
         }
       },
       "required": ["id", "expression"]
+    },
+    "schemaBasedAop": {
+      "type": "object",
+      "description": "Schema-based AOP Support",
+      "properties": {
+        "config": {
+          "type": "object",
+          "description": "Within your Spring configurations, all aspect and advisor elements must be placed within an <aop:config> element.",
+          "properties": {
+            "pointcut": {
+              "type": "string",
+              "description": "Pointcut expressions and advice kinds."
+            },
+            "advisor": {
+              "type": "string",
+              "description": "Advisor elements within <aop:config>."
+            },
+            "aspect": {
+              "type": "string",
+              "description": "Aspect elements within <aop:config>."
+            }
+          },
+          "required": ["pointcut", "advisor", "aspect"]
+        }
+      },
+      "required": ["config"]
     }
   }
 }
