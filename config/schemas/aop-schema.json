@@ -75,6 +75,10 @@
             "proxy-target-class": {
               "type": "boolean",
               "description": "Enable proxying of target classes."
+            },
+            "expose-proxy": {
+              "type": "boolean",
+              "description": "Make the current proxy available to the AOP framework."
             }
           }
         }
