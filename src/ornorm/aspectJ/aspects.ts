@@ -9,6 +9,34 @@ import {
     SourceFile
 } from 'ts-morph';
 
+/*
+Aspects
+
+aspect A { … }
+    defines the aspect A
+privileged aspect A { … }
+    A can access private fields and methods
+aspect A extends B implements I, J { … }
+    B is a class or abstract aspect, I and J are interfaces
+aspect A percflow( call(void Foo.m()) ) { … }
+    an instance of A is instantiated for every control flow through
+    calls to m()
+
+general form:
+    [ privileged ] [ Modifiers ] aspect Id
+        [ extends Type ] [ implements TypeList ] [ PerClause ]
+            { Body }
+
+where PerClause is one of
+    pertarget ( Pointcut )
+    perthis ( Pointcut )
+    percflow ( Pointcut )
+    percflowbelow ( Pointcut )
+    pertypewithin( TypePattern )
+    issingleton ()
+ */
+
+
 // Create a new project using ts-morph
 const project: Project = new Project();
 // Add a new source file named Aspects.ts
