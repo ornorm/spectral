@@ -61,7 +61,9 @@
           }
         }
       },
-      "required": ["bean"]
+      "required": [
+        "bean"
+      ]
     },
     "context": {
       "type": "object",
@@ -88,7 +90,14 @@
           "description": "Enable annotation-based MBean export."
         }
       },
-      "required": ["component-scan", "annotation-config", "property-placeholder", "load-time-weaver", "spring-configured", "mbean-export"]
+      "required": [
+        "component-scan",
+        "annotation-config",
+        "property-placeholder",
+        "load-time-weaver",
+        "spring-configured",
+        "mbean-export"
+      ]
     },
     "aop": {
       "type": "object",
@@ -146,10 +155,16 @@
               "description": "Aspect elements within <aop:config>."
             }
           },
-          "required": ["pointcut", "advisor", "aspect"]
+          "required": [
+            "pointcut",
+            "advisor",
+            "aspect"
+          ]
         }
       },
-      "required": ["config"]
+      "required": [
+        "config"
+      ]
     },
     "declaringAspect": {
       "type": "object",
@@ -162,7 +177,10 @@
           "$ref": "#/$defs/bean"
         }
       },
-      "required": ["aspect", "bean"]
+      "required": [
+        "aspect",
+        "bean"
+      ]
     },
     "declaringPointcut": {
       "type": "object",
@@ -172,7 +190,9 @@
           "$ref": "#/$defs/pointcut"
         }
       },
-      "required": ["pointcut"]
+      "required": [
+        "pointcut"
+      ]
     },
     "declaringAdvice": {
       "type": "object",
@@ -182,7 +202,9 @@
           "$ref": "#/$defs/advice"
         }
       },
-      "required": ["advice"]
+      "required": [
+        "advice"
+      ]
     },
     "adviceParameters": {
       "type": "object",
@@ -205,7 +227,12 @@
           "description": "Comma-delimited list of parameter names."
         }
       },
-      "required": ["pointcut", "advisor", "aspect", "arg-names"]
+      "required": [
+        "pointcut",
+        "advisor",
+        "aspect",
+        "arg-names"
+      ]
     },
     "adviceOrdering": {
       "type": "object",
@@ -220,7 +247,10 @@
           "description": "The precedence between aspects is determined via the order attribute in the <aop:aspect> element or by using the @Order annotation."
         }
       },
-      "required": ["order", "precedence"]
+      "required": [
+        "order",
+        "precedence"
+      ]
     },
     "aspectInstantiationModels": {
       "type": "object",
@@ -231,7 +261,9 @@
           "description": "The only supported instantiation model for schema-defined aspects is the singleton model."
         }
       },
-      "required": ["singleton"]
+      "required": [
+        "singleton"
+      ]
     },
     "advisors": {
       "type": "object",
@@ -254,10 +286,15 @@
               "description": "The order attribute to define the Ordered value of the advisor."
             }
           },
-          "required": ["pointcut-ref", "advice-ref"]
+          "required": [
+            "pointcut-ref",
+            "advice-ref"
+          ]
         }
       },
-      "required": ["advisor"]
+      "required": [
+        "advisor"
+      ]
     },
     "mixingAspectTypes": {
       "type": "object",
@@ -268,7 +305,9 @@
           "description": "It is perfectly possible to mix @AspectJ style aspects by using the auto-proxying support, schema-defined <aop:aspect> aspects, <aop:advisor> declared advisors, and even proxies and interceptors in other styles in the same configuration."
         }
       },
-      "required": ["description"]
+      "required": [
+        "description"
+      ]
     },
     "choosingAopDeclarationStyle": {
       "type": "object",
@@ -290,10 +329,16 @@
               "description": "Using proxy-target-class=\"true\" on <tx:annotation-driven/>, <aop:aspectj-autoproxy/>, or <aop:config/> elements forces the use of CGLIB proxies for all three of them."
             }
           },
-          "required": ["jdkDynamicProxies", "cglibProxies", "proxyTargetClass"]
+          "required": [
+            "jdkDynamicProxies",
+            "cglibProxies",
+            "proxyTargetClass"
+          ]
         }
       },
-      "required": ["proxyingMechanisms"]
+      "required": [
+        "proxyingMechanisms"
+      ]
     },
     "bean": {
       "type": "object",
@@ -325,7 +370,9 @@
                     "description": "The static field to inject."
                   }
                 },
-                "required": ["static-field"]
+                "required": [
+                  "static-field"
+                ]
               }
             ]
           }
@@ -349,7 +396,9 @@
                     "description": "The static field to inject."
                   }
                 },
-                "required": ["static-field"]
+                "required": [
+                  "static-field"
+                ]
               }
             ]
           }
@@ -367,7 +416,10 @@
               "description": "The path to the property."
             }
           },
-          "required": ["id", "path"]
+          "required": [
+            "id",
+            "path"
+          ]
         },
         "listFactory": {
           "type": "object",
@@ -389,7 +441,10 @@
               "description": "The class of the list to instantiate."
             }
           },
-          "required": ["id", "sourceList"]
+          "required": [
+            "id",
+            "sourceList"
+          ]
         },
         "mapFactory": {
           "type": "object",
@@ -411,7 +466,10 @@
               "description": "The class of the map to instantiate."
             }
           },
-          "required": ["id", "sourceMap"]
+          "required": [
+            "id",
+            "sourceMap"
+          ]
         },
         "setFactory": {
           "type": "object",
@@ -433,10 +491,16 @@
               "description": "The class of the set to instantiate."
             }
           },
-          "required": ["id", "sourceSet"]
+          "required": [
+            "id",
+            "sourceSet"
+          ]
         }
       },
-      "required": ["id", "class"]
+      "required": [
+        "id",
+        "class"
+      ]
     },
     "meta": {
       "type": "object",
@@ -450,7 +514,10 @@
           "description": "The value of the metadata."
         }
       },
-      "required": ["key", "value"]
+      "required": [
+        "key",
+        "value"
+      ]
     },
     "aspect": {
       "type": "object",
@@ -498,7 +565,10 @@
           "description": "The body of the aspect."
         }
       },
-      "required": ["id", "body"]
+      "required": [
+        "id",
+        "body"
+      ]
     },
     "advice": {
       "type": "object",
@@ -556,7 +626,10 @@
           "description": "The method providing the body of the after throwing advice."
         }
       },
-      "required": ["id", "method"]
+      "required": [
+        "id",
+        "method"
+      ]
     },
     "pointcut": {
       "type": "object",
@@ -571,7 +644,10 @@
           "description": "The pointcut expression."
         }
       },
-      "required": ["id", "expression"]
+      "required": [
+        "id",
+        "expression"
+      ]
     },
     "util": {
       "type": "object",
@@ -584,25 +660,32 @@
               "description": "The static field to inject."
             }
           },
-          "required": ["static-field"]
+          "required": [
+            "static-field"
+          ]
         },
-        "propertyPath": {
+        "FieldRetrievingFactoryBean": {
           "type": "object",
-          propertyPath": {
-            "type": "object",
-            "properties": {
-              "id": {
-                "type": "string",
-                "description": "The unique identifier for the property path."
-              },
-              "path": {
-                "type": "string",
-                "description": "The path to the property."
-              },
-              "targetBeanName": {
-                "type": "string",
-                "description": "The name of the target bean."
-              }
+          "properties": {
+            "staticField": {
+              "type": "string",
+              "description": "The fully qualified name of the static field."
             },
-            "required": ["id", "path", "targetBeanName"]
-          }
+            "targetField": {
+              "type": "string",
+              "description": "The name of the field."
+            }
+          },
+          "required": [
+            "staticField",
+            "targetField"
+          ]
+        }
+      },
+      "required": [
+        "constant",
+        "FieldRetrievingFactoryBean"
+      ]
+    }
+  }
+}
