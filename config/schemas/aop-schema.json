@@ -224,6 +224,20 @@
         }
       },
       "required": ["id", "class"]
+    },
+    "meta": {
+      "type": "object",
+      "properties": {
+        "key": {
+          "type": "string",
+          "description": "The key of the metadata."
+        },
+        "value": {
+          "type": "string",
+          "description": "The value of the metadata."
+        }
+      },
+      "required": ["key", "value"]
     }
   }
 }
