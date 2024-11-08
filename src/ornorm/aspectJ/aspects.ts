@@ -369,7 +369,7 @@ export function declareParentsImplements(
         name: 'declareParentsImplements',
         statements: [
             // Check if the class implements the interfaces
-            `if (!areInterfacesImplemented('${className}', ${JSON.stringify(interfaces)})) {`,
+            `if (!areInterfacesImplemented(this.constructor, '${className}', ${JSON.stringify(interfaces)})) {`,
             `    throw new Error('Implementation is not legal: ${className} cannot implement ${interfaces.join(', ')}');`,
             `}`,
             // Log the declaration that class className implements interfaces
