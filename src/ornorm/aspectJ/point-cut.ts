@@ -3,7 +3,8 @@ import {
     StructureKind,
     Scope,
     MethodDeclarationStructure,
-    SourceFile
+    SourceFile,
+    ClassDeclarationStructure
 } from 'ts-morph';
 
 /*
@@ -60,11 +61,21 @@ function createPointcut(
     };
 }
 
-// Add pointcut definitions to the source file
-sourceFile.addMethod(createPointcut('pc', 'private', '', 'call(void Foo.m())'));
-sourceFile.addMethod(createPointcut('pc', 'package', 'int i', 'set(int Foo.x) && args(i)'));
-sourceFile.addMethod(createPointcut('pc', 'public', '', ''));
-sourceFile.addMethod(createPointcut('pc', 'abstract', 'Object o', ''));
+// Create the class with pointcut methods
+const pointCutClass: ClassDeclarationStructure = {
+    kind: StructureKind.Class,
+    name: 'PointCuts',
+    isExported: true,
+    methods: [
+        createPointcut('pc', 'private', '', 'call(void Foo.m())'),
+        createPointcut('pc', 'package', 'int i', 'set(int Foo.x) && args(i)'),
+        createPointcut('pc', 'public', '', ''),
+        createPointcut('pc', 'abstract', 'Object o', '')
+    ]
+};
+
+// Add the class to the source file
+sourceFile.addClass(pointCutClass);
 
 // Save the source file
 project.save().then(() => {
