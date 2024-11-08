@@ -450,9 +450,7 @@ export function declareError(
     aspectClass: ClassDeclaration, pointcut: string, message: string): void {
     aspectClass.addMethod({
         name: 'declareError',
-        statements: [
-            `throw new SyntaxError('${pointcut} : "${message}" );`
-        ],
+        statements: [`throw new SyntaxError('${pointcut} : "${message}" );`],
         returnType: 'void',
         kind: StructureKind.Method,
     });
