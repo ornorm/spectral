@@ -464,7 +464,7 @@ export function declareError(
  * @param pointcut - The pointcut at which the exception should be wrapped.
  *
  * @example
- * declareSoft('IOException', 'execution(Foo.new(..))');
+ * declareSoft(aspectClass, 'IOException', 'execution(Foo.new(..))');
  */
 export function declareSoft(aspectClass: ClassDeclaration, exceptionType: string, pointcut: string): void {
     aspectClass.addMethod({
