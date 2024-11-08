@@ -196,6 +196,10 @@
             "throwing": {
               "type": "string",
               "description": "The name of the parameter to which the thrown exception should be passed."
+            },
+            "finally": {
+              "type": "string",
+              "description": "The method providing the body of the after (finally) advice."
             }
           },
           "required": ["id", "method"]
