@@ -45,6 +45,9 @@
     },
     "choosingAopDeclarationStyle": {
       "$ref": "#/$defs/choosingAopDeclarationStyle"
+    },
+    "util": {
+      "$ref": "#/$defs/util"
     }
   },
   "$defs": {
@@ -569,6 +572,22 @@
         }
       },
       "required": ["id", "expression"]
+    },
+    "util": {
+      "type": "object",
+      "properties": {
+        "constant": {
+          "type": "object",
+          "properties": {
+            "static-field": {
+              "type": "string",
+              "description": "The static field to inject."
+            }
+          },
+          "required": ["static-field"]
+        }
+      },
+      "required": ["constant"]
     }
   }
 }
