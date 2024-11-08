@@ -410,16 +410,19 @@ export function areInterfacesImplemented(
 }
 
 /**
- * Declares a compiler warning for a specified pointcut.
+ * Declares a compiler `warning` for a specified `pointcut`.
  *
- * @param aspectClass - The aspect class.
- * @param pointcut - The pointcut at which the warning should be issued.
- * @param message - The warning message.
+ * @param aspectClass - The `aspect` class.
+ * @param pointcut - The `pointcut` at which the `warning` should be
+ * issued.
+ * @param message - The `warning` message.
  *
  * @example
- * declareWarning('set(* Point.*) && !within(Point)', 'bad set');
+ * declareWarning(aspectClass, 'set(* Point.*) && !within(Point)', 'bad set');
  */
-export function declareWarning(aspectClass: ClassDeclaration, pointcut: string, message: string): void {
+export function declareWarning(
+    aspectClass: ClassDeclaration, pointcut: string, message: string
+): void {
     aspectClass.addMethod({
         name: 'declareWarning',
         statements: [`console.warn('declare warning : ${pointcut} : "${message}";');`],
