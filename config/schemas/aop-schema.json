@@ -1,0 +1,59 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Spring Util Schema",
+  "type": "object",
+  "properties": {
+    "beans": {
+      "type": "object",
+      "properties": {
+        "bean": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/bean"
+          }
+        }
+      },
+      "required": ["bean"]
+    }
+  },
+  "definitions": {
+    "bean": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "The unique identifier for the bean."
+        },
+        "class": {
+          "type": "string",
+          "description": "The class name of the bean."
+        },
+        "properties": {
+          "type": "object",
+          "description": "The properties to set on the bean.",
+          "additionalProperties": {
+            "oneOf": [
+              {
+                "type": "string"
+              },
+              {
+                "$ref": "#/definitions/bean"
+              },
+              {
+                "type": "object",
+                "properties": {
+                  "static-field": {
+                    "type": "string",
+                    "description": "The static field to inject."
+                  }
+                },
+                "required": ["static-field"]
+              }
+            ]
+          }
+        }
+      },
+      "required": ["id", "class"]
+    }
+  }
+}

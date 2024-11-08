@@ -276,6 +276,52 @@
         "ref",
         "advices"
       ]
+    },
+    "Bean": {
+      "$id": "#/definitions/bean",
+      "type": "object",
+      "description": "Represents the configuration for a bean.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "The unique identifier for the bean.",
+          "readOnly": true
+        },
+        "class": {
+          "type": "string",
+          "description": "The class name of the bean."
+        },
+        "properties": {
+          "type": "object",
+          "description": "The properties to set on the bean.",
+          "additionalProperties": {
+            "oneOf": [
+              {
+                "type": "string"
+              },
+              {
+                "$ref": "#/definitions/bean"
+              },
+              {
+                "type": "object",
+                "properties": {
+                  "static-field": {
+                    "type": "string",
+                    "description": "The static field to inject."
+                  }
+                },
+                "required": [
+                  "static-field"
+                ]
+              }
+            ]
+          }
+        }
+      },
+      "required": [
+        "id",
+        "class"
+      ]
     }
   },
   "properties": {
@@ -298,6 +344,13 @@
       "description": "The advisors defined in the configuration.",
       "items": {
         "$ref": "#/definitions/advisor"
+      }
+    },
+    "beans": {
+      "type": "array",
+      "description": "The beans defined in the configuration.",
+      "items": {
+        "$ref": "#/definitions/bean"
       }
     },
     "proxyTargetClass": {
