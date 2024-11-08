@@ -25,7 +25,7 @@ import {
     isMethodMatcher,
     JoinPoint,
     Method,
-    MethodMatcher
+    MethodMatcher, Type
 } from '@ornorm/spectral';
 
 /**
@@ -50,6 +50,7 @@ export type Advice = Function | Method;
 export class Advisor {
     private readonly privateAdvice: Advice;
     private readonly privatePointcut: ClassFilter | MethodMatcher;
+    private matchJoinPoint: boolean = false;
 
     /**
      * Creates an instance of Advisor.
@@ -71,6 +72,14 @@ export class Advisor {
      */
     public get advice(): Advice {
         return this.privateAdvice;
+    }
+
+    public get executed(): boolean {
+        return this.matchJoinPoint;
+    }
+
+    public set executed(value: boolean) {
+        this.matchJoinPoint = value;
     }
 
     /**
@@ -109,20 +118,54 @@ export class Advisor {
     public execute<T extends object = any>(
         joinPoint: JoinPoint<T>, ...args: Array<any>
     ): any {
+        this.executed = false;
         if (
             isClassFilter(this.pointcut) &&
             this.pointcut.filter(joinPoint.type)
         ) {
+            this.executed = true;
             return this.advice.call(joinPoint.scope, ...args);
         } else if (
             isMethodMatcher(this.pointcut) &&
             this.pointcut.matches(joinPoint.method, joinPoint.type, joinPoint.args)
         ) {
+            this.executed = true;
             return this.advice.call(joinPoint.scope, ...args);
         }
+        return undefined;
     }
 }
 
+/**
+ * Retrieves the matching advisor for a given target, method, and type.
+ * @param target - The target object.
+ * @param method - The method to match.
+ * @param type - The type of the target object.
+ * @returns The matching Advisor if found, otherwise undefined.
+ * @see Method
+ * @see Type
+ */
+export function getMatchingAdvisor<T extends object = any>(
+    target: any, method: Method, type: Type<T>
+): Advisor | undefined {
+    const advisors: Array<Advisor> =
+        Reflect.getMetadata('advisors', target.constructor) || [];
+    for (const advisor of advisors) {
+        if (advisor.isMethodAdvice) {
+            const matcher: MethodMatcher = advisor.pointcut as MethodMatcher;
+            if (matcher.matches(method, type)) {
+                return advisor;
+            }
+        }
+        if (advisor.isClassAdvice) {
+            const filter: ClassFilter = advisor.pointcut as ClassFilter;
+            if (filter.filter(type)) {
+                return advisor;
+            }
+        }
+    }
+    return undefined
+}
 
 /**
  * Decorator to define a before advice.
@@ -133,7 +176,7 @@ export class Advisor {
 export function Before(pointcut: string, argNames?: string): MethodDecorator {
     return function (target: any, propertyKey: string | symbol, descriptor: PropertyDescriptor): void {
         const originalMethod: Method = descriptor.value;
-        descriptor.value = function (...args: Array<any> ): any {
+        descriptor.value = function (...args: Array<any>): any {
             const joinPoint: JoinPoint = new JoinPoint(this, propertyKey.toString(), args);
             const beforeAdvices: Array<{
                 pointcut: string,
@@ -141,7 +184,9 @@ export function Before(pointcut: string, argNames?: string): MethodDecorator {
             }> = Reflect.getMetadata('before', target.constructor) || [];
             beforeAdvices.forEach((advice: { pointcut: string, method: Function }) => {
                 if (advice.pointcut === pointcut) {
-                    const paramNames: Array<string> = argNames ? argNames.split(',') : getParameterNames(target.constructor, propertyKey as string);
+                    const paramNames: Array<string> = argNames ?
+                        argNames.split(',') :
+                        getParameterNames(target.constructor, propertyKey as string);
                     const adviceArgs: Array<string> = paramNames.map((name: string) => {
                         if (name === 'joinPoint') {
                             return joinPoint;
@@ -151,6 +196,15 @@ export function Before(pointcut: string, argNames?: string): MethodDecorator {
                     advice.method.apply(this, adviceArgs);
                 }
             });
+            let result: any = undefined;
+            const advisor: Advisor | undefined =
+                getMatchingAdvisor(this, originalMethod, this.constructor as Type);
+            if (advisor) {
+                result = advisor.execute(joinPoint, ...args);
+            }
+            if (advisor && advisor.executed) {
+                return result;
+            }
             return originalMethod.apply(this, args);
         };
         const existingBeforeAdvices: Array<{
@@ -171,32 +225,43 @@ export function Before(pointcut: string, argNames?: string): MethodDecorator {
  */
 export function AfterReturning(pointcut: string, argNames?: string): MethodDecorator {
     return function (target: any, propertyKey: string | symbol, descriptor: PropertyDescriptor): void {
-        const originalMethod: Function = descriptor.value;
-        descriptor.value = function (...args: Array<any> ): any {
+        const originalMethod: Method = descriptor.value;
+        descriptor.value = function (...args: Array<any>): any {
+            const joinPoint: JoinPoint = new JoinPoint(this, propertyKey.toString(), args);
+            const advisor: Advisor | undefined =
+                getMatchingAdvisor(this, originalMethod, this.constructor as Type);
             const result: any = originalMethod.apply(this, args);
-            const joinPoint: JoinPoint = new JoinPoint(this, propertyKey as string, args);
             const afterReturningAdvices: Array<{
                 pointcut: string,
                 method: Function
             }> = Reflect.getMetadata('afterReturning', target.constructor) || [];
             afterReturningAdvices.forEach((advice: { pointcut: string, method: Function }) => {
                 if (advice.pointcut === pointcut) {
-                    const paramNames: Array<string> = argNames ? argNames.split(',') : getParameterNames(target.constructor, propertyKey as string);
-                    const adviceArgs: Array<any> = paramNames.map(name => {
-                        if (name === 'joinPoint') return joinPoint;
-                        if (name === 'result') return result;
+                    const paramNames: Array<string> = argNames ?
+                        argNames.split(',') :
+                        getParameterNames(target.constructor, propertyKey as string);
+                    const adviceArgs: Array<any> = paramNames.map((name: string) => {
+                        if (name === 'joinPoint') {
+                            return joinPoint;
+                        }
+                        if (name === 'result') {
+                            return result;
+                        }
                         return args[paramNames.indexOf(name)];
                     });
                     advice.method.apply(this, adviceArgs);
                 }
             });
+            if (advisor) {
+                advisor.execute(joinPoint, ...args);
+            }
             return result;
         };
         const existingAfterReturningAdvices: Array<{
             pointcut: string,
             method: Function
         }> = Reflect.getMetadata('afterReturning', target.constructor) || [];
-        existingAfterReturningAdvices.push({pointcut, method: (target as any)[propertyKey as string]});
+        existingAfterReturningAdvices.push({pointcut, method: (target as any)[propertyKey.toString()]});
         Reflect.defineMetadata('afterReturning', existingAfterReturningAdvices, target.constructor);
     };
 }
@@ -210,19 +275,22 @@ export function AfterReturning(pointcut: string, argNames?: string): MethodDecor
  */
 export function AfterThrowing(pointcut: string, argNames?: string): MethodDecorator {
     return function (target: any, propertyKey: string | symbol, descriptor: PropertyDescriptor): void {
-        const originalMethod: Function = descriptor.value;
-        descriptor.value = function (...args: Array<any> ): any {
+        const originalMethod: Method = descriptor.value;
+        descriptor.value = function (...args: Array<any>): any {
             try {
                 return originalMethod.apply(this, args);
             } catch (error: any) {
                 const joinPoint: JoinPoint = new JoinPoint(this, propertyKey as string, args);
+                const advisor: Advisor | undefined = getMatchingAdvisor(this, originalMethod, this.constructor as Type);
                 const afterThrowingAdvices: Array<{
                     pointcut: string,
                     method: Function
                 }> = Reflect.getMetadata('afterThrowing', target.constructor) || [];
                 afterThrowingAdvices.forEach((advice: { pointcut: string, method: Function }) => {
                     if (advice.pointcut === pointcut) {
-                        const paramNames: Array<string> = argNames ? argNames.split(',') : getParameterNames(target.constructor, propertyKey as string);
+                        const paramNames: Array<string> =
+                            argNames ? argNames.split(',') :
+                                getParameterNames(target.constructor, propertyKey as string);
                         const adviceArgs: Array<any> = paramNames.map(name => {
                             if (name === 'joinPoint') return joinPoint;
                             if (name === 'error') return error;
@@ -231,6 +299,9 @@ export function AfterThrowing(pointcut: string, argNames?: string): MethodDecora
                         advice.method.apply(this, adviceArgs);
                     }
                 });
+                if (advisor) {
+                    advisor.execute(joinPoint, ...args);
+                }
                 throw error;
             }
         };
@@ -252,9 +323,10 @@ export function AfterThrowing(pointcut: string, argNames?: string): MethodDecora
  */
 export function After(pointcut: string, argNames?: string): MethodDecorator {
     return function (target: any, propertyKey: string | symbol, descriptor: PropertyDescriptor): void {
-        const originalMethod: Function = descriptor.value;
-        descriptor.value = function (...args: Array<any> ): any {
+        const originalMethod: Method = descriptor.value;
+        descriptor.value = function (...args: Array<any>): any {
             const joinPoint: JoinPoint = new JoinPoint(this, propertyKey as string, args);
+            const advisor: Advisor | undefined = getMatchingAdvisor(this, originalMethod, this.constructor as Type);
             const afterAdvices: Array<{
                 pointcut: string,
                 method: Function
@@ -272,6 +344,9 @@ export function After(pointcut: string, argNames?: string): MethodDecorator {
                         advice.method.apply(this, adviceArgs);
                     }
                 });
+                if (advisor) {
+                    advisor.execute(joinPoint, ...args);
+                }
             }
         };
         const existingAfterAdvices: Array<{
@@ -292,9 +367,10 @@ export function After(pointcut: string, argNames?: string): MethodDecorator {
  */
 export function Around(pointcut: string, argNames?: string): MethodDecorator {
     return function (target: any, propertyKey: string | symbol, descriptor: PropertyDescriptor): void {
-        const originalMethod: Function = descriptor.value;
-        descriptor.value = function (...args: Array<any> ): any {
+        const originalMethod: Method = descriptor.value;
+        descriptor.value = function (...args: Array<any>): any {
             const joinPoint: JoinPoint = new JoinPoint(this, propertyKey as string, args);
+            const advisor: Advisor | undefined = getMatchingAdvisor(this, originalMethod, this.constructor as Type);
             const aroundAdvices: Array<{
                 pointcut: string,
                 method: Function
@@ -303,13 +379,19 @@ export function Around(pointcut: string, argNames?: string): MethodDecorator {
             aroundAdvices.forEach((advice: { pointcut: string, method: Function }) => {
                 if (advice.pointcut === pointcut) {
                     const paramNames: Array<string> = argNames ? argNames.split(',') : getParameterNames(target.constructor, propertyKey as string);
-                    const adviceArgs: Array<any> = paramNames.map(name => {
-                        if (name === 'joinPoint') return joinPoint;
+                    const adviceArgs: Array<any> = paramNames.map((name: string) => {
+                        if (name === 'joinPoint') {
+                            return joinPoint;
+                        }
                         return args[paramNames.indexOf(name)];
                     });
-                    result = advice.method.apply(this, adviceArgs.concat(() => originalMethod.apply(this, args)));
+                    result = advice.method.apply(this, adviceArgs.concat(() =>
+                        originalMethod.apply(this, args)));
                 }
             });
+            if (advisor) {
+                advisor.execute(joinPoint, ...args);
+            }
             return result;
         };
         const existingAroundAdvices: Array<{
