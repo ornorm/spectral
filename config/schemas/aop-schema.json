@@ -1,6 +1,6 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
-  "title": "Spring Util Schema",
+  "title": "Spring AOP Schema",
   "type": "object",
   "properties": {
     "beans": {
@@ -14,6 +14,59 @@
         }
       },
       "required": ["bean"]
+    },
+    "context": {
+      "type": "object",
+      "properties": {
+        "component-scan": {
+          "type": "object",
+          "properties": {
+            "base-package": {
+              "type": "string",
+              "description": "The base package for component scanning."
+            }
+          },
+          "required": ["base-package"]
+        },
+        "annotation-config": {
+          "type": "boolean",
+          "description": "Enable annotation-driven configuration."
+        },
+        "property-placeholder": {
+          "type": "object",
+          "properties": {
+            "location": {
+              "type": "string",
+              "description": "The location of the properties file."
+            }
+          },
+          "required": ["location"]
+        }
+      },
+      "required": ["component-scan", "annotation-config", "property-placeholder"]
+    },
+    "aop": {
+      "type": "object",
+      "properties": {
+        "config": {
+          "type": "object",
+          "properties": {
+            "proxy-target-class": {
+              "type": "boolean",
+              "description": "Enable proxying of target classes."
+            }
+          }
+        },
+        "aspectj-autoproxy": {
+          "type": "object",
+          "properties": {
+            "proxy-target-class": {
+              "type": "boolean",
+              "description": "Enable proxying of target classes."
+            }
+          }
+        }
+      }
     }
   },
   "definitions": {
