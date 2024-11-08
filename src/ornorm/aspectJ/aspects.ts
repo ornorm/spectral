@@ -288,11 +288,12 @@ export type MemberDeclarationsArray =
     Array<MethodDeclarationStructure | ConstructorDeclarationStructure | PropertyDeclarationStructure>;
 
 /**
- * Declares that the superclass of a given class is another class.
+ * Declares that the `superclass` of a given class is another `class`.
  *
- * @param className - The name of the class whose superclass is
+ * @param aspectClass - The `aspect` class.
+ * @param className - The name of the `class` whose `superclass` is
  * being declared.
- * @param superClassName - The name of the superclass.
+ * @param superClassName - The name of the `superclass`.
  *
  * @example
  * declareParentsExtends(aspectClass, 'C', 'D');
@@ -321,15 +322,18 @@ export function declareParentsExtends(
 }
 
 /**
- * Checks if the inheritance is legal according to AspectJ specifications.
+ * Checks if the inheritance is legal according to `AspectJ` specifications.
  *
- * @param aspectClass - The class to check.
- * @param className - The name of the class.
- * @param superClassName - The name of the superclass.
+ * @param aspectClass - The `aspect` class.
+ * @param className - The name of the `class`.
+ * @param superClassName - The name of the `superclass`.
  * @returns  Returns true if the inheritance is legal, false otherwise.
  * @throws ReferenceError if the class or superclass is not found.
+ * @see ClassDeclaration
  */
-export function isLegalInheritance(aspectClass: ClassDeclaration, className: string, superClassName: string): boolean {
+export function isLegalInheritance(
+    aspectClass: ClassDeclaration, className: string, superClassName: string
+): boolean {
     // Find class declarations within the provided aspect class
     let classDeclaration: ClassDeclaration | undefined =
         aspectClass.getSourceFile().getClass(className);
@@ -348,13 +352,15 @@ export function isLegalInheritance(aspectClass: ClassDeclaration, className: str
 }
 
 /**
- * Declares that a given class implements one or more interfaces.
+ * Declares that a given `class` implements one or more interfaces.
  *
- * @param className - The name of the class.
- * @param interfaces - The interfaces that the class implements.
+ * @param aspectClass - The `aspect` class.
+ * @param className - The name of the `class.
+ * @param interfaces - The interfaces that the `class` implements.
  *
  * @example
  * declareParentsImplements(aspectClass, 'C', ['I', 'J']);
+ * @see ClassDeclaration
  */
 export function declareParentsImplements(
     aspectClass: ClassDeclaration, className: string, interfaces: Array<string>): void {
@@ -375,16 +381,19 @@ export function declareParentsImplements(
 }
 
 /**
- * Checks if the class implements the given interfaces.
+ * Checks if the `class` implements the given interfaces.
  *
- * @param aspectClass - The class to check.
- * @param className The name of the class.
- * @param interfaces The interfaces that the class should implement.
+ * @param aspectClass - The `aspect` class.
+ * @param className The name of the `class`.
+ * @param interfaces The interfaces that the `class` should implement.
  * @returns  Returns true if the class implements the interfaces, false
  * otherwise.
  * @throws ReferenceError if the class is not found.
+ * @see ClassDeclaration
  */
-export function areInterfacesImplemented(aspectClass: ClassDeclaration, className: string, interfaces: string[]): boolean {
+export function areInterfacesImplemented(
+    aspectClass: ClassDeclaration, className: string, interfaces: Array<string>
+): boolean {
     // Find class declaration within the provided aspect class
     let classDeclaration: ClassDeclaration | undefined =
         aspectClass.getSourceFile().getClass(className);
@@ -403,6 +412,7 @@ export function areInterfacesImplemented(aspectClass: ClassDeclaration, classNam
 /**
  * Declares a compiler warning for a specified pointcut.
  *
+ * @param aspectClass - The aspect class.
  * @param pointcut - The pointcut at which the warning should be issued.
  * @param message - The warning message.
  *
