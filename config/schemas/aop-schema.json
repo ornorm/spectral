@@ -1,70 +1,80 @@
 {
+  "$id": "http://example.com/schemas/aop-schema.json",
   "$schema": "http://json-schema.org/draft-07/schema#",
   "title": "Spring AOP Schema",
   "type": "object",
   "properties": {
+    "beans": {
+      "$ref": "#/$defs/beans"
+    },
+    "context": {
+      "$ref": "#/$defs/context"
+    },
+    "aop": {
+      "$ref": "#/$defs/aop"
+    },
+    "aspects": {
+      "$ref": "#/$defs/aspects"
+    },
+    "schemaBasedAop": {
+      "$ref": "#/$defs/schemaBasedAop"
+    },
+    "declaringAspect": {
+      "$ref": "#/$defs/declaringAspect"
+    },
+    "declaringPointcut": {
+      "$ref": "#/$defs/declaringPointcut"
+    },
+    "declaringAdvice": {
+      "$ref": "#/$defs/declaringAdvice"
+    },
+    "adviceParameters": {
+      "$ref": "#/$defs/adviceParameters"
+    },
+    "adviceOrdering": {
+      "$ref": "#/$defs/adviceOrdering"
+    },
+    "aspectInstantiationModels": {
+      "$ref": "#/$defs/aspectInstantiationModels"
+    },
+    "advisors": {
+      "$ref": "#/$defs/advisors"
+    },
+    "mixingAspectTypes": {
+      "$ref": "#/$defs/mixingAspectTypes"
+    },
+    "choosingAopDeclarationStyle": {
+      "$ref": "#/$defs/choosingAopDeclarationStyle"
+    }
+  },
+  "$defs": {
     "beans": {
       "type": "object",
       "properties": {
         "bean": {
           "type": "array",
           "items": {
-            "$ref": "#/definitions/bean"
+            "$ref": "#/$defs/bean"
           }
         }
       },
-      "required": [
-        "bean"
-      ]
+      "required": ["bean"]
     },
     "context": {
       "type": "object",
       "properties": {
         "component-scan": {
-          "type": "object",
-          "properties": {
-            "base-package": {
-              "type": "string",
-              "description": "The base package for component scanning."
-            }
-          },
-          "required": [
-            "base-package"
-          ]
+          "$ref": "#/$defs/componentScan"
         },
         "annotation-config": {
           "type": "boolean",
           "description": "Enable annotation-driven configuration."
         },
         "property-placeholder": {
-          "type": "object",
-          "properties": {
-            "location": {
-              "type": "string",
-              "description": "The location of the properties file."
-            }
-          },
-          "required": [
-            "location"
-          ]
+          "$ref": "#/$defs/propertyPlaceholder"
         },
         "load-time-weaver": {
-          "type": "object",
-          "description": "Enable the Spring Framework’s LTW support.",
-          "properties": {
-            "class": {
-              "type": "string",
-              "description": "The class name of the LoadTimeWeaver implementation."
-            },
-            "weaver-class": {
-              "type": "string",
-              "description": "The fully qualified class name of the LoadTimeWeaver implementation."
-            }
-          },
-          "required": [
-            "class",
-            "weaver-class"
-          ]
+          "$ref": "#/$defs/loadTimeWeaver"
         },
         "spring-configured": {
           "type": "object",
@@ -75,14 +85,7 @@
           "description": "Enable annotation-based MBean export."
         }
       },
-      "required": [
-        "component-scan",
-        "annotation-config",
-        "property-placeholder",
-        "load-time-weaver",
-        "spring-configured",
-        "mbean-export"
-      ]
+      "required": ["component-scan", "annotation-config", "property-placeholder", "load-time-weaver", "spring-configured", "mbean-export"]
     },
     "aop": {
       "type": "object",
@@ -115,26 +118,7 @@
       "type": "object",
       "properties": {
         "aspect": {
-          "type": "object",
-          "properties": {
-            "id": {
-              "type": "string",
-              "description": "The unique identifier for the aspect."
-            },
-            "ref": {
-              "type": "string",
-              "description": "Reference to the backing bean."
-            },
-            "aop-xml": {
-              "type": "string",
-              "description": "Path to the META-INF/aop.xml file."
-            }
-          },
-          "required": [
-            "id",
-            "ref",
-            "aop-xml"
-          ]
+          "$ref": "#/$defs/aspect"
         }
       }
     },
@@ -159,160 +143,43 @@
               "description": "Aspect elements within <aop:config>."
             }
           },
-          "required": [
-            "pointcut",
-            "advisor",
-            "aspect"
-          ]
+          "required": ["pointcut", "advisor", "aspect"]
         }
       },
-      "required": [
-        "config"
-      ]
+      "required": ["config"]
     },
     "declaringAspect": {
       "type": "object",
       "description": "Declaring an Aspect",
       "properties": {
         "aspect": {
-          "type": "object",
-          "description": "An aspect is a regular Java object defined as a bean in your Spring application context.",
-          "properties": {
-            "id": {
-              "type": "string",
-              "description": "The unique identifier for the aspect."
-            },
-            "ref": {
-              "type": "string",
-              "description": "Reference to the backing bean."
-            }
-          },
-          "required": [
-            "id",
-            "ref"
-          ]
+          "$ref": "#/$defs/aspect"
         },
         "bean": {
-          "type": "object",
-          "description": "The bean that backs the aspect can be configured and dependency injected just like any other Spring bean.",
-          "properties": {
-            "id": {
-              "type": "string",
-              "description": "The unique identifier for the bean."
-            },
-            "class": {
-              "type": "string",
-              "description": "The class name of the bean."
-            }
-          },
-          "required": [
-            "id",
-            "class"
-          ]
+          "$ref": "#/$defs/bean"
         }
       },
-      "required": [
-        "aspect",
-        "bean"
-      ]
+      "required": ["aspect", "bean"]
     },
     "declaringPointcut": {
       "type": "object",
       "description": "Declaring a Pointcut",
       "properties": {
         "pointcut": {
-          "type": "object",
-          "description": "A pointcut that represents the execution of any business service in the service layer.",
-          "properties": {
-            "id": {
-              "type": "string",
-              "description": "The unique identifier for the pointcut."
-            },
-            "expression": {
-              "type": "string",
-              "description": "The pointcut expression."
-            }
-          },
-          "required": [
-            "id",
-            "expression"
-          ]
+          "$ref": "#/$defs/pointcut"
         }
       },
-      "required": [
-        "pointcut"
-      ]
+      "required": ["pointcut"]
     },
     "declaringAdvice": {
       "type": "object",
       "description": "Declaring Advice",
       "properties": {
         "advice": {
-          "type": "object",
-          "description": "The schema-based AOP support uses five kinds of advice: Before, After, After Returning, After Throwing, and Around.",
-          "properties": {
-            "id": {
-              "type": "string",
-              "description": "The unique identifier for the advice."
-            },
-            "pointcut-ref": {
-              "type": "string",
-              "description": "Reference to a named pointcut."
-            },
-            "pointcut": {
-              "type": "string",
-              "description": "Inline pointcut expression."
-            },
-            "method": {
-              "type": "string",
-              "description": "The method providing the body of the advice."
-            },
-            "returning": {
-              "type": "string",
-              "description": "The name of the parameter to which the return value should be passed."
-            },
-            "throwing": {
-              "type": "string",
-              "description": "The name of the parameter to which the thrown exception should be passed."
-            },
-            "finally": {
-              "type": "string",
-              "description": "The method providing the body of the after (finally) advice."
-            },
-            "around": {
-              "type": "string",
-              "description": "The method providing the body of the around advice."
-            },
-            "arg-names": {
-              "type": "string",
-              "description": "Comma-delimited list of parameter names."
-            },
-            "before": {
-              "type": "string",
-              "description": "The method providing the body of the before advice."
-            },
-            "after": {
-              "type": "string",
-              "description": "The method providing the body of the after advice."
-            },
-            "afterReturning": {
-              "type": "string",
-              "description": "The method providing the body of the after returning advice."
-            },
-            "afterThrowing": {
-              "type": "string",
-              "description": "The method providing the body of the after throwing advice."
-            }
-          },
-          "required": [
-            "id",
-            "method"
-          ]
+          "$ref": "#/$defs/advice"
         }
       },
-      "required": [
-        "advice"
-      ]
+      "required": ["advice"]
     },
     "adviceParameters": {
       "type": "object",
@@ -335,12 +202,7 @@
           "description": "Comma-delimited list of parameter names."
         }
       },
-      "required": [
-        "pointcut",
-        "advisor",
-        "aspect",
-        "arg-names"
-      ]
+      "required": ["pointcut", "advisor", "aspect", "arg-names"]
     },
     "adviceOrdering": {
       "type": "object",
@@ -355,10 +217,7 @@
           "description": "The precedence between aspects is determined via the order attribute in the <aop:aspect> element or by using the @Order annotation."
         }
       },
-      "required": [
-        "order",
-        "precedence"
-      ]
+      "required": ["order", "precedence"]
     },
     "aspectInstantiationModels": {
       "type": "object",
@@ -369,9 +228,7 @@
           "description": "The only supported instantiation model for schema-defined aspects is the singleton model."
         }
       },
-      "required": [
-        "singleton"
-      ]
+      "required": ["singleton"]
     },
     "advisors": {
       "type": "object",
@@ -394,15 +251,10 @@
               "description": "The order attribute to define the Ordered value of the advisor."
             }
           },
-          "required": [
-            "pointcut-ref",
-            "advice-ref"
-          ]
+          "required": ["pointcut-ref", "advice-ref"]
         }
       },
-      "required": [
-        "advisor"
-      ]
+      "required": ["advisor"]
     },
     "mixingAspectTypes": {
       "type": "object",
@@ -413,9 +265,7 @@
           "description": "It is perfectly possible to mix @AspectJ style aspects by using the auto-proxying support, schema-defined <aop:aspect> aspects, <aop:advisor> declared advisors, and even proxies and interceptors in other styles in the same configuration."
         }
       },
-      "required": [
-        "description"
-      ]
+      "required": ["description"]
     },
     "choosingAopDeclarationStyle": {
       "type": "object",
@@ -437,19 +287,11 @@
               "description": "Using proxy-target-class=\"true\" on <tx:annotation-driven/>, <aop:aspectj-autoproxy/>, or <aop:config/> elements forces the use of CGLIB proxies for all three of them."
             }
           },
-          "required": [
-            "jdkDynamicProxies",
-            "cglibProxies",
-            "proxyTargetClass"
-          ]
+          "required": ["jdkDynamicProxies", "cglibProxies", "proxyTargetClass"]
         }
       },
-      "required": [
-        "proxyingMechanisms"
-      ]
-    }
-  },
-  "definitions": {
+      "required": ["proxyingMechanisms"]
+    },
     "bean": {
       "type": "object",
       "properties": {
@@ -470,7 +312,7 @@
                 "type": "string"
               },
               {
-                "$ref": "#/definitions/bean"
+                "$ref": "#/$defs/bean"
               },
               {
                 "type": "object",
@@ -480,9 +322,7 @@
                     "description": "The static field to inject."
                   }
                 },
-                "required": [
-                  "static-field"
-                ]
+                "required": ["static-field"]
               }
             ]
           }
@@ -496,7 +336,7 @@
                 "type": "string"
               },
               {
-                "$ref": "#/definitions/bean"
+                "$ref": "#/$defs/bean"
               },
               {
                 "type": "object",
@@ -506,9 +346,7 @@
                     "description": "The static field to inject."
                   }
                 },
-                "required": [
-                  "static-field"
-                ]
+                "required": ["static-field"]
               }
             ]
           }
@@ -526,10 +364,7 @@
               "description": "The path to the property."
             }
           },
-          "required": [
-            "id",
-            "path"
-          ]
+          "required": ["id", "path"]
         },
         "listFactory": {
           "type": "object",
@@ -551,10 +386,7 @@
               "description": "The class of the list to instantiate."
             }
           },
-          "required": [
-            "id",
-            "sourceList"
-          ]
+          "required": ["id", "sourceList"]
         },
         "mapFactory": {
           "type": "object",
@@ -576,10 +408,7 @@
               "description": "The class of the map to instantiate."
             }
           },
-          "required": [
-            "id",
-            "sourceMap"
-          ]
+          "required": ["id", "sourceMap"]
         },
         "setFactory": {
           "type": "object",
@@ -601,16 +430,10 @@
               "description": "The class of the set to instantiate."
             }
           },
-          "required": [
-            "id",
-            "sourceSet"
-          ]
+          "required": ["id", "sourceSet"]
         }
       },
-      "required": [
-        "id",
-        "class"
-      ]
+      "required": ["id", "class"]
     },
     "meta": {
       "type": "object",
@@ -624,10 +447,7 @@
           "description": "The value of the metadata."
         }
       },
-      "required": [
-        "key",
-        "value"
-      ]
+      "required": ["key", "value"]
     },
     "aspect": {
       "type": "object",
@@ -675,10 +495,7 @@
           "description": "The body of the aspect."
         }
       },
-      "required": [
-        "id",
-        "body"
-      ]
+      "required": ["id", "body"]
     },
     "advice": {
       "type": "object",
@@ -736,10 +553,22 @@
           "description": "The method providing the body of the after throwing advice."
         }
       },
-      "required": [
-        "id",
-        "method"
-      ]
+      "required": ["id", "method"]
+    },
+    "pointcut": {
+      "type": "object",
+      "description": "A pointcut that represents the execution of any business service in the service layer.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "The unique identifier for the pointcut."
+        },
+        "expression": {
+          "type": "string",
+          "description": "The pointcut expression."
+        }
+      },
+      "required": ["id", "expression"]
     }
   }
 }
