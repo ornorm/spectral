@@ -38,6 +38,7 @@ where PerClause is one of
 
 /*
 Inter-type Member Declarations in aspects
+
 int Foo . m ( int i ) { ... }
     a method int m(int) owned by Foo, visible anywhere in the
     defining package. In the body, this refers to the instance of Foo,
@@ -66,6 +67,51 @@ general form:
     [ Modifiers ] Type . new ( Formals )
         [ throws TypeList ] { Body }
     [ Modifiers ] Type Type . Id [ = Expression ] ;
+ */
+
+/*
+Other Inter-type Declarations in aspects
+
+declare parents : C extends D;
+    declares that the superclass of C is D. This is only legal if D is
+    declared to extend the original superclass of C.
+declare parents : C implements I, J ;
+    C implements I and J
+declare warning : set(* Point.*) && !within(Point) : “bad set” ;
+    the compiler warns “bad set” if it finds a set to any field of
+    Point outside of the code for Point
+declare error : call(Singleton.new(..)) : “bad construction” ;
+    the compiler signals an error “bad construction” if it finds a call
+    to any constructor of Singleton
+declare soft : IOException : execution(Foo.new(..));
+    any IOException thrown from executions of the constructors of
+    Foo are wrapped in org.aspectj.SoftException
+declare precedence : Security, Logging, * ;
+    at each join point, advice from Security has precedence over
+    advice from Logging, which has precedence over other advice.
+declare @type: C : @SomeAnnotation;
+    declares the annotation “@SomeAnnotation” on the type C.
+declare @method: * C.foo*(..) : @SomeAnnotation;
+    declares the annotation “@SomeAnnotation” on all methods
+    declared in C starting with “foo”.
+declare @constructor: C.new(..) : @SomeAnnotation;
+    declares the annotation “@SomeAnnotation” on all constructors
+    declared in C.
+declare @field: * C.* : @SomeAnnotation;
+    declares the annotation “@SomeAnnotation” on all fields
+    declared in C.
+
+general form
+    declare parents : TypePat extends Type ;
+    declare parents : TypePat implements TypeList ;
+    declare warning : Pointcut : String ;
+    declare error : Pointcut : String ;
+    declare soft : Type : Pointcut ;
+    declare precedence : TypePatList ;
+    declare @type : TypePat : Annotation;
+    declare @method: MethodPat : Annotation;
+    declare @constructor: ConstructorPat : Annotation;
+    declare @field : FieldPat : Annotation;
  */
 
 // Type Aliases for Method Shapes
