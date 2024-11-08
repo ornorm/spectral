@@ -522,6 +522,54 @@
         }
       },
       "required": ["key", "value"]
+    },
+    "aspect": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "The unique identifier for the aspect."
+        },
+        "privileged": {
+          "type": "boolean",
+          "description": "Indicates if the aspect is privileged."
+        },
+        "modifiers": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Modifiers for the aspect."
+        },
+        "extends": {
+          "type": "string",
+          "description": "The class or abstract aspect that this aspect extends."
+        },
+        "implements": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Interfaces that this aspect implements."
+        },
+        "perClause": {
+          "type": "string",
+          "enum": [
+            "pertarget",
+            "perthis",
+            "percflow",
+            "percflowbelow",
+            "pertypewithin",
+            "issingleton"
+          ],
+          "description": "The per-clause defining the aspect instantiation model."
+        },
+        "body": {
+          "type": "string",
+          "description": "The body of the aspect."
+        }
+      },
+      "required": ["id", "body"]
     }
   }
 }
