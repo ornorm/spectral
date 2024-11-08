@@ -1,120 +1,13 @@
 import {
     Project,
     StructureKind,
-    Scope,
     ClassDeclaration,
     SourceFile,
     MethodDeclarationStructure,
     ConstructorDeclarationStructure,
-    PropertyDeclarationStructure
+    PropertyDeclarationStructure,
+    Scope
 } from 'ts-morph';
-
-/*
-Aspects
-
-aspect A { … }
-    defines the aspect A
-privileged aspect A { … }
-    A can access private fields and methods
-aspect A extends B implements I, J { … }
-    B is a class or abstract aspect, I and J are interfaces
-aspect A percflow( call(void Foo.m()) ) { … }
-    an instance of A is instantiated for every control flow through
-    calls to m()
-
-general form:
-    [ privileged ] [ Modifiers ] aspect Id
-        [ extends Type ] [ implements TypeList ] [ PerClause ]
-            { Body }
-
-where PerClause is one of
-    pertarget ( Pointcut )
-    perthis ( Pointcut )
-    percflow ( Pointcut )
-    percflowbelow ( Pointcut )
-    pertypewithin( TypePattern )
-    issingleton ()
- */
-
-/*
-Inter-type Member Declarations in aspects
-
-int Foo . m ( int i ) { ... }
-    a method int m(int) owned by Foo, visible anywhere in the
-    defining package. In the body, this refers to the instance of Foo,
-    not the aspect.
-private int Foo . m ( int i ) throws IOException { ... }
-    a method int m(int) that is declared to throw IOException, only
-    visible in the defining aspect. In the body, this refers to the
-    instance of Foo, not the aspect.
-abstract int Foo . m ( int i ) ;
-    an abstract method int m(int) owned by Foo
-Point . new ( int x, int y ) { ... }
-    a constructor owned by Point. In the body, this refers to the new
-    Point, not the aspect.
-private static int Point . x ;
-    a static int field named x owned by Point and visible only in the
-    declaring aspect
-private int Point . x = foo() ;
-    a non-static field initialized to the result of calling foo(). In the
-    initializer, this refers to the instance of Foo, not the aspect.
-
-general form:
-    [ Modifiers ] Type Type . Id ( Formals )
-        [ throws TypeList ] { Body }
-    abstract [ Modifiers ] Type Type . Id ( Formals )
-        [ throws TypeList ] ;
-    [ Modifiers ] Type . new ( Formals )
-        [ throws TypeList ] { Body }
-    [ Modifiers ] Type Type . Id [ = Expression ] ;
- */
-
-/*
-Other Inter-type Declarations in aspects
-
-declare parents : C extends D;
-    declares that the superclass of C is D. This is only legal if D is
-    declared to extend the original superclass of C.
-declare parents : C implements I, J ;
-    C implements I and J
-declare warning : set(* Point.*) && !within(Point) : “bad set” ;
-    the compiler warns “bad set” if it finds a set to any field of
-    Point outside of the code for Point
-declare error : call(Singleton.new(..)) : “bad construction” ;
-    the compiler signals an error “bad construction” if it finds a call
-    to any constructor of Singleton
-declare soft : IOException : execution(Foo.new(..));
-    any IOException thrown from executions of the constructors of
-    Foo are wrapped in org.aspectj.SoftException
-declare precedence : Security, Logging, * ;
-    at each join point, advice from Security has precedence over
-    advice from Logging, which has precedence over other advice.
-declare @type: C : @SomeAnnotation;
-    declares the annotation “@SomeAnnotation” on the type C.
-declare @method: * C.foo*(..) : @SomeAnnotation;
-    declares the annotation “@SomeAnnotation” on all methods
-    declared in C starting with “foo”.
-declare @constructor: C.new(..) : @SomeAnnotation;
-    declares the annotation “@SomeAnnotation” on all constructors
-    declared in C.
-declare @field: * C.* : @SomeAnnotation;
-    declares the annotation “@SomeAnnotation” on all fields
-    declared in C.
-
-general form
-    declare parents : TypePat extends Type ;
-    declare parents : TypePat implements TypeList ;
-    declare warning : Pointcut : String ;
-    declare error : Pointcut : String ;
-    declare soft : Type : Pointcut ;
-    declare precedence : TypePatList ;
-    declare @type : TypePat : Annotation;
-    declare @method: MethodPat : Annotation;
-    declare @constructor: ConstructorPat : Annotation;
-    declare @field : FieldPat : Annotation;
- */
-
-// Type Aliases for Method Shapes
 
 /**
  * Type alias for an abstract method form.
@@ -124,6 +17,7 @@ general form
  * @template R - The type of the return value.
  */
 export type AbstractMethodForm<T = any, R = any> = abstract new (value: T) => R;
+
 /**
  * Type alias for a constructor form.
  * Represents a constructor that takes a variable number of arguments of type T and returns an instance of type T.
@@ -131,6 +25,7 @@ export type AbstractMethodForm<T = any, R = any> = abstract new (value: T) => R;
  * @template T - The type of the constructor arguments and the return value.
  */
 export type ConstructorForm<T = any> = new (...args: T[]) => T;
+
 /**
  * Type alias for a method form.
  * Represents a method that takes a value of type T and returns a value of type R.
@@ -139,6 +34,7 @@ export type ConstructorForm<T = any> = new (...args: T[]) => T;
  * @template R - The type of the return value.
  */
 export type MethodForm<T = any, R = any> = (value: T) => R;
+
 /**
  * Type alias for a property form.
  * Represents a property of type T.
@@ -146,10 +42,10 @@ export type MethodForm<T = any, R = any> = (value: T) => R;
  * @template T - The type of the property.
  */
 export type PropertyForm<T = any> = T;
+
 /**
  * Type alias for an array of member declarations.
- * Represents an array that can contain method, constructor, or property
- * declarations.
+ * Represents an array that can contain method, constructor, or property declarations.
  * @see MethodDeclarationStructure
  * @see ConstructorDeclarationStructure
  * @see PropertyDeclarationStructure
@@ -163,10 +59,15 @@ export type MemberDeclarationsArray = Array<MethodDeclarationStructure | Constru
  * @param superClassName - The name of the superclass.
  *
  * @example
- * declareParents('C', 'D');
+ * declareParentsExtends('C', 'D');
  */
-export function declareParentsExtends(className: string, superClassName: string): void {
-    console.log(`declare parents : ${className} extends ${superClassName};`);
+export function declareParentsExtends(aspectClass: ClassDeclaration, className: string, superClassName: string): void {
+    aspectClass.addMethod({
+        name: 'declareParentsExtends',
+        statements: [`console.log('declare parents : ${className} extends ${superClassName};');`],
+        returnType: 'void',
+        kind: StructureKind.Method,
+    });
 }
 
 /**
@@ -178,8 +79,13 @@ export function declareParentsExtends(className: string, superClassName: string)
  * @example
  * declareParentsImplements('C', ['I', 'J']);
  */
-export function declareParentsImplements(className: string, interfaces: string[]): void {
-    console.log(`declare parents : ${className} implements ${interfaces.join(', ')};`);
+export function declareParentsImplements(aspectClass: ClassDeclaration, className: string, interfaces: string[]): void {
+    aspectClass.addMethod({
+        name: 'declareParentsImplements',
+        statements: [`console.log('declare parents : ${className} implements ${interfaces.join(', ')};');`],
+        returnType: 'void',
+        kind: StructureKind.Method,
+    });
 }
 
 /**
@@ -191,8 +97,13 @@ export function declareParentsImplements(className: string, interfaces: string[]
  * @example
  * declareWarning('set(* Point.*) && !within(Point)', 'bad set');
  */
-export function declareWarning(pointcut: string, message: string): void {
-    console.log(`declare warning : ${pointcut} : "${message}";`);
+export function declareWarning(aspectClass: ClassDeclaration, pointcut: string, message: string): void {
+    aspectClass.addMethod({
+        name: 'declareWarning',
+        statements: [`console.log('declare warning : ${pointcut} : "${message}";');`],
+        returnType: 'void',
+        kind: StructureKind.Method,
+    });
 }
 
 /**
@@ -204,8 +115,13 @@ export function declareWarning(pointcut: string, message: string): void {
  * @example
  * declareError('call(Singleton.new(..))', 'bad construction');
  */
-export function declareError(pointcut: string, message: string): void {
-    console.log(`declare error : ${pointcut} : "${message}";`);
+export function declareError(aspectClass: ClassDeclaration, pointcut: string, message: string): void {
+    aspectClass.addMethod({
+        name: 'declareError',
+        statements: [`console.log('declare error : ${pointcut} : "${message}";');`],
+        returnType: 'void',
+        kind: StructureKind.Method,
+    });
 }
 
 /**
@@ -218,8 +134,13 @@ export function declareError(pointcut: string, message: string): void {
  * @example
  * declareSoft('IOException', 'execution(Foo.new(..))');
  */
-export function declareSoft(exceptionType: string, pointcut: string): void {
-    console.log(`declare soft : ${exceptionType} : ${pointcut};`);
+export function declareSoft(aspectClass: ClassDeclaration, exceptionType: string, pointcut: string): void {
+    aspectClass.addMethod({
+        name: 'declareSoft',
+        statements: [`console.log('declare soft : ${exceptionType} : ${pointcut};');`],
+        returnType: 'void',
+        kind: StructureKind.Method,
+    });
 }
 
 /**
@@ -230,8 +151,13 @@ export function declareSoft(exceptionType: string, pointcut: string): void {
  * @example
  * declarePrecedence(['Security', 'Logging', '*']);
  */
-export function declarePrecedence(aspects: string[]): void {
-    console.log(`declare precedence : ${aspects.join(', ')};`);
+export function declarePrecedence(aspectClass: ClassDeclaration, aspects: string[]): void {
+    aspectClass.addMethod({
+        name: 'declarePrecedence',
+        statements: [`console.log('declare precedence : ${aspects.join(', ')};');`],
+        returnType: 'void',
+        kind: StructureKind.Method,
+    });
 }
 
 /**
@@ -243,8 +169,13 @@ export function declarePrecedence(aspects: string[]): void {
  * @example
  * declareTypeAnnotation('C', '@SomeAnnotation');
  */
-export function declareTypeAnnotation(type: string, annotation: string): void {
-    console.log(`declare @type: ${type} : ${annotation};`);
+export function declareTypeAnnotation(aspectClass: ClassDeclaration, type: string, annotation: string): void {
+    aspectClass.addMethod({
+        name: 'declareTypeAnnotation',
+        statements: [`console.log('declare @type: ${type} : ${annotation};');`],
+        returnType: 'void',
+        kind: StructureKind.Method,
+    });
 }
 
 /**
@@ -256,8 +187,13 @@ export function declareTypeAnnotation(type: string, annotation: string): void {
  * @example
  * declareMethodAnnotation('* C.foo*(..)', '@SomeAnnotation');
  */
-export function declareMethodAnnotation(methodPattern: string, annotation: string): void {
-    console.log(`declare @method: ${methodPattern} : ${annotation};`);
+export function declareMethodAnnotation(aspectClass: ClassDeclaration, methodPattern: string, annotation: string): void {
+    aspectClass.addMethod({
+        name: 'declareMethodAnnotation',
+        statements: [`console.log('declare @method: ${methodPattern} : ${annotation};');`],
+        returnType: 'void',
+        kind: StructureKind.Method,
+    });
 }
 
 /**
@@ -269,8 +205,13 @@ export function declareMethodAnnotation(methodPattern: string, annotation: strin
  * @example
  * declareConstructorAnnotation('C.new(..)', '@SomeAnnotation');
  */
-export function declareConstructorAnnotation(constructorPattern: string, annotation: string): void {
-    console.log(`declare @constructor: ${constructorPattern} : ${annotation};`);
+export function declareConstructorAnnotation(aspectClass: ClassDeclaration, constructorPattern: string, annotation: string): void {
+    aspectClass.addMethod({
+        name: 'declareConstructorAnnotation',
+        statements: [`console.log('declare @constructor: ${constructorPattern} : ${annotation};');`],
+        returnType: 'void',
+        kind: StructureKind.Method,
+    });
 }
 
 /**
@@ -282,8 +223,13 @@ export function declareConstructorAnnotation(constructorPattern: string, annotat
  * @example
  * declareFieldAnnotation('* C.*', '@SomeAnnotation');
  */
-export function declareFieldAnnotation(fieldPattern: string, annotation: string): void {
-    console.log(`declare @field: ${fieldPattern} : ${annotation};`);
+export function declareFieldAnnotation(aspectClass: ClassDeclaration, fieldPattern: string, annotation: string): void {
+    aspectClass.addMethod({
+        name: 'declareFieldAnnotation',
+        statements: [`console.log('declare @field: ${fieldPattern} : ${annotation};');`],
+        returnType: 'void',
+        kind: StructureKind.Method,
+    });
 }
 
 // Create a new project using ts-morph
@@ -299,27 +245,19 @@ const sourceFile: SourceFile = project.createSourceFile('Aspects.ts', '', { over
  * constructors, and fields) to add to the aspect.
  * @see MemberDeclarationsArray
  */
-export function addInterTypeMember(
-    aspectClass: ClassDeclaration, members: MemberDeclarationsArray
-): void {
+export function addInterTypeMember(aspectClass: ClassDeclaration, members: MemberDeclarationsArray): void {
     for (const member of members) {
         if (member.kind === StructureKind.Method) {
-            // Validate against MethodForm1 and MethodForm2
-            if (typeof member.returnType === 'string' &&
-                member.returnType !== 'void' &&
-                (member.parameters?.length || 0) > 0
-            ) {
+            if (typeof member.returnType === 'string' && member.returnType !== 'void' && (member.parameters?.length || 0) > 0) {
                 aspectClass.addMethod(member as MethodDeclarationStructure);
             } else if (typeof member.returnType === 'string' && member.isAbstract) {
                 aspectClass.addMethod(member as MethodDeclarationStructure);
             }
         } else if (member.kind === StructureKind.Constructor) {
-            // Validate against ConstructorForm
             if ((member.parameters?.length || 0) > 0) {
                 aspectClass.addConstructor(member as ConstructorDeclarationStructure);
             }
         } else if (member.kind === StructureKind.Property) {
-            // Validate against PropertyForm
             if (typeof member.initializer === 'string' || typeof member.type === 'string') {
                 aspectClass.addProperty(member as PropertyDeclarationStructure);
             }
@@ -343,62 +281,27 @@ export function addInterTypeMember(
  * @see ClassDeclaration
  * @see MemberDeclarationsArray
  */
-export function createAspectClass(
-    name: string,
-    isPrivileged: boolean,
-    extendsClass?: string,
-    implementsInterfaces?: Array<string>,
-    perClause?: string,
-    members?: MemberDeclarationsArray
-): ClassDeclaration {
-    // Add a class declaration to the source file
+export function createAspectClass(name: string, isPrivileged: boolean, extendsClass?: string, implementsInterfaces?: Array<string>, perClause?: string, members?: MemberDeclarationsArray): ClassDeclaration {
     const aspectClass: ClassDeclaration = sourceFile.addClass({
         name: name,
         isAbstract: false,
-        decorators: [
-            {
-                name: 'Aspect',
-                arguments: [],
-                kind: StructureKind.Decorator
-            }
-        ],
+        decorators: [{ name: 'Aspect', arguments: [], kind: StructureKind.Decorator }],
         extends: extendsClass,
         implements: implementsInterfaces,
         kind: StructureKind.Class
     });
 
-    // If the aspect is privileged, add private fields and methods
     if (isPrivileged) {
-        aspectClass.addProperty({
-            name: 'privateField',
-            type: 'string',
-            scope: Scope.Private,
-        });
-
-        aspectClass.addMethod({
-            name: 'privateMethod',
-            statements: [`console.log('Private method executed');`],
-            scope: Scope.Private,
-        });
+        aspectClass.addProperty({ name: 'privateField', type: 'string', scope: Scope.Private });
+        aspectClass.addMethod({ name: 'privateMethod', statements: [`console.log('Private method executed');`], scope: Scope.Private });
     }
 
-    // Add a public method named advice
-    aspectClass.addMethod({
-        name: 'advice',
-        statements: [`console.log('Advice executed');`],
-        returnType: 'void',
-    });
+    aspectClass.addMethod({ name: 'advice', statements: [`console.log('Advice executed');`], returnType: 'void' });
 
-    // If a PerClause is specified, add it as a decorator
     if (perClause) {
-        aspectClass.addDecorator({
-            name: 'PerClause',
-            arguments: [perClause],
-            kind: StructureKind.Decorator
-        });
+        aspectClass.addDecorator({ name: 'PerClause', arguments: [perClause], kind: StructureKind.Decorator });
     }
 
-    // Add and validate general intertype forms
     if (members) {
         addInterTypeMember(aspectClass, members);
     }
@@ -406,15 +309,29 @@ export function createAspectClass(
     return aspectClass;
 }
 
-// Example of creating aspects with various PerClause definitions
-createAspectClass('PertargetAspect', true, undefined, undefined, 'pertarget(call(void Foo.m()))');
-createAspectClass('PerthisAspect', false, undefined, undefined, 'perthis(call(void Foo.m()))');
-createAspectClass('PercflowAspect', false, undefined, undefined, 'percflow(call(void Foo.m()))');
-createAspectClass('PercflowbelowAspect', false, undefined, undefined, 'percflowbelow(call(void Foo.m()))');
-createAspectClass('PertypewithinAspect', false, undefined, undefined, 'pertypewithin(Foo)');
-createAspectClass('IssingletonAspect', false, undefined, undefined, 'issingleton()');
+// Example usage
+const exampleClass: ClassDeclaration = sourceFile.addClass({ name: 'ExampleAspect', isAbstract: false, kind: StructureKind.Class });
+declareParentsExtends(exampleClass, 'C', 'D');
+declareParentsImplements(exampleClass, 'C', ['I', 'J']);
+declareWarning(exampleClass, 'set(* Point.*) && !within(Point)', 'bad set');
+declareError(exampleClass, 'call(Singleton.new(..))', 'bad construction');
+declareSoft(exampleClass, 'IOException', 'execution(Foo.new(..))');
+declarePrecedence(exampleClass, ['Security', 'Logging', '*']);
+declareTypeAnnotation(exampleClass, 'C', '@SomeAnnotation');
+declareMethodAnnotation(exampleClass, '* C.foo*(..)', '@SomeAnnotation');
+declareConstructorAnnotation(exampleClass, 'C.new(..)', '@SomeAnnotation');
+declareFieldAnnotation(exampleClass, '* C.*', '@SomeAnnotation');
+
+const members: MemberDeclarationsArray = [
+    { kind: StructureKind.Method, name: 'exampleMethod', returnType: 'void', parameters: [] },
+    { kind: StructureKind.Constructor, parameters: [] },
+    { kind: StructureKind.Property, name: 'exampleProperty', type: 'string', initializer: `'example'` }
+];
+addInterTypeMember(exampleClass, members);
+
+createAspectClass('ExampleAspectClass', true, 'SuperClass', ['Interface1', 'Interface2'], 'perthis(call(void Foo.m()))', members);
 
 // Save the source file
 project.save().then(() => {
-    console.log('Aspects.ts has been updated with validation and creation of intertypes');
+    console.log('Aspects.ts has been updated with new functions and examples');
 });
