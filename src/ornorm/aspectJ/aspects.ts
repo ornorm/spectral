@@ -429,7 +429,7 @@ export function declareWarning(
             'const e = new Error();',
             `const currentLine = e.stack.split('\\n')[2].split(':')[1];`,
             `const currentColumn = e.stack.split('\\n')[2].split(':')[2];`,
-            `console.warn('declare warning : ${pointcut} : "${message}" at line ' + currentLine + ', column ' + currentColumn);`
+            `console.warn('${pointcut} : "${message}" at line ' + currentLine + ', column ' + currentColumn);`
         ],
         returnType: 'void',
         kind: StructureKind.Method,
@@ -437,23 +437,21 @@ export function declareWarning(
 }
 
 /**
- * Declares a compiler error for a specified pointcut.
+ * Declares a compiler `error` for a specified `pointcut`.
  *
- * @param pointcut - The pointcut at which the error should be issued.
- * @param message - The error message.
+ * @param aspectClass - The `aspect` class.
+ * @param pointcut - The `pointcut` at which the error should be issued.
+ * @param message - The `error` message.
  *
  * @example
- * declareError('call(Singleton.new(..))', 'bad construction');
+ * declareError(aspectClass, 'call(Singleton.new(..))', 'bad construction');
  */
 export function declareError(
     aspectClass: ClassDeclaration, pointcut: string, message: string): void {
     aspectClass.addMethod({
         name: 'declareError',
         statements: [
-            'const e = new Error();',
-            `const currentLine = e.stack.split('\\n')[2].split(':')[1];`,
-            `const currentColumn = e.stack.split('\\n')[2].split(':')[2];`,
-            `console.error(new SyntaxError('PointcutError : ${pointcut} : "${message}";'));`
+            `throw new SyntaxError('${pointcut} : "${message}" );`
         ],
         returnType: 'void',
         kind: StructureKind.Method,
