@@ -204,12 +204,39 @@
             "around": {
               "type": "string",
               "description": "The method providing the body of the around advice."
+            },
+            "arg-names": {
+              "type": "string",
+              "description": "Comma-delimited list of parameter names."
             }
           },
           "required": ["id", "method"]
         }
       },
       "required": ["advice"]
+    },
+    "adviceParameters": {
+      "type": "object",
+      "description": "Advice Parameters",
+      "properties": {
+        "pointcut": {
+          "type": "string",
+          "description": "Pointcut expressions and advice kinds."
+        },
+        "advisor": {
+          "type": "string",
+          "description": "Advisor elements within <aop:config>."
+        },
+        "aspect": {
+          "type": "string",
+          "description": "Aspect elements within <aop:config>."
+        },
+        "arg-names": {
+          "type": "string",
+          "description": "Comma-delimited list of parameter names."
+        }
+      },
+      "required": ["pointcut", "advisor", "aspect", "arg-names"]
     }
   },
   "definitions": {
