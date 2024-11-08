@@ -1,0 +1,88 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Layers",
+  "type": "object",
+  "properties": {
+    "layers": {
+      "type": "object",
+      "properties": {
+        "application": {
+          "type": "object",
+          "properties": {
+            "into": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "include": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
+                  },
+                  "exclude": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
+                  },
+                  "layer": {
+                    "type": "string"
+                  }
+                },
+                "required": ["layer"]
+              }
+            }
+          }
+        },
+        "dependencies": {
+          "type": "object",
+          "properties": {
+            "into": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "include": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
+                  },
+                  "exclude": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
+                  },
+                  "includeModuleDependencies": {
+                    "type": "string"
+                  },
+                  "excludeModuleDependencies": {
+                    "type": "string"
+                  },
+                  "layer": {
+                    "type": "string"
+                  }
+                },
+                "required": ["layer"]
+              }
+            }
+          }
+        },
+        "layerOrder": {
+          "type": "object",
+          "properties": {
+            "layer": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "minLength": 1
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
