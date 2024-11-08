@@ -3,9 +3,6 @@ import {
     StructureKind,
     Scope,
     ClassDeclaration,
-    PropertyDeclarationStructure,
-    MethodDeclarationStructure,
-    DecoratorStructure,
     SourceFile
 } from 'ts-morph';
 
