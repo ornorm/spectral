@@ -1,0 +1,240 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "http://www.springframework.org/schema/aop",
+  "title": "Spring AOP Schema 2.5",
+  "description": "Defines the configuration elements for the Spring Framework's AOP support.",
+  "type": "object",
+  "properties": {
+    "config": {
+      "type": "object",
+      "description": "A section (compartmentalization) of AOP-specific configuration (including aspects, pointcuts, etc).",
+      "properties": {
+        "pointcut": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/pointcutType"
+          },
+          "description": "A named pointcut definition."
+        },
+        "advisor": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/advisorType"
+          },
+          "description": "A named advisor definition."
+        },
+        "aspect": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/aspectType"
+          },
+          "description": "A named aspect definition."
+        }
+      },
+      "required": ["pointcut", "advisor", "aspect"]
+    },
+    "aspectj-autoproxy": {
+      "type": "object",
+      "description": "Enables the use of the @AspectJ style of Spring AOP.",
+      "properties": {
+        "include": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/includeType"
+          },
+          "description": "Indicates that only @AspectJ beans with names matched by the (regex) pattern will be considered as defining aspects to use for Spring autoproxying."
+        }
+      },
+      "required": ["include"]
+    },
+    "scoped-proxy": {
+      "type": "object",
+      "description": "Marks a bean definition as being a scoped proxy.",
+      "properties": {
+        "proxy-target-class": {
+          "type": "boolean",
+          "default": true,
+          "description": "Are class-based (CGLIB) proxies to be created? This is the default; in order to switch to standard Java interface-based proxies, turn this flag to 'false'."
+        }
+      },
+      "required": ["proxy-target-class"]
+    }
+  },
+  "definitions": {
+    "aspectType": {
+      "type": "object",
+      "properties": {
+        "pointcut": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/pointcutType"
+          },
+          "description": "A named pointcut definition."
+        },
+        "declare-parents": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/declareParentsType"
+          },
+          "description": "Allows this aspect to introduce additional interfaces that the advised object will transparently implement."
+        },
+        "before": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/basicAdviceType"
+          },
+          "description": "A before advice definition."
+        },
+        "after": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/basicAdviceType"
+          },
+          "description": "An after advice definition."
+        },
+        "after-returning": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/afterReturningAdviceType"
+          },
+          "description": "An after-returning advice definition."
+        },
+        "after-throwing": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/afterThrowingAdviceType"
+          },
+          "description": "An after-throwing advice definition."
+        },
+        "around": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/basicAdviceType"
+          },
+          "description": "An around advice definition."
+        }
+      },
+      "required": ["pointcut", "declare-parents", "before", "after", "after-returning", "after-throwing", "around"]
+    },
+    "includeType": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "The regular expression defining which beans are to be included in the list of @AspectJ beans; beans with names matched by the pattern will be included."
+        }
+      },
+      "required": ["name"]
+    },
+    "pointcutType": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "The unique identifier for a pointcut."
+        },
+        "expression": {
+          "type": "string",
+          "description": "The pointcut expression. For example: 'execution(* com.xyz.myapp.service.*.*(..))'."
+        }
+      },
+      "required": ["id", "expression"]
+    },
+    "declareParentsType": {
+      "type": "object",
+      "properties": {
+        "types-matching": {
+          "type": "string",
+          "description": "The AspectJ type expression that defines what types (classes) the introduction is restricted to. An example would be 'org.springframework.beans.ITestBean+'."
+        },
+        "implement-interface": {
+          "type": "string",
+          "description": "The fully qualified name of the interface that will be introduced."
+        },
+        "default-impl": {
+          "type": "string",
+          "description": "The fully qualified name of the class that will be instantiated to serve as the default implementation of the introduced interface."
+        },
+        "delegate-ref": {
+          "type": "string",
+          "description": "A reference to the bean that will serve as the default implementation of the introduced interface."
+        }
+      },
+      "required": ["types-matching", "implement-interface"]
+    },
+    "basicAdviceType": {
+      "type": "object",
+      "properties": {
+        "pointcut": {
+          "type": "string",
+          "description": "The associated pointcut expression."
+        },
+        "pointcut-ref": {
+          "type": "string",
+          "description": "The name of an associated pointcut definition."
+        },
+        "method": {
+          "type": "string",
+          "description": "The name of the method that defines the logic of the advice."
+        },
+        "arg-names": {
+          "type": "string",
+          "description": "The comma-delimited list of advice method argument (parameter) names that will be matched from pointcut parameters."
+        }
+      },
+      "required": ["method"]
+    },
+    "afterReturningAdviceType": {
+      "allOf": [
+        {
+          "$ref": "#/definitions/basicAdviceType"
+        }
+      ],
+      "properties": {
+        "returning": {
+          "type": "string",
+          "description": "The name of the method parameter to which the return value must be passed."
+        }
+      }
+    },
+    "afterThrowingAdviceType": {
+      "allOf": [
+        {
+          "$ref": "#/definitions/basicAdviceType"
+        }
+      ],
+      "properties": {
+        "throwing": {
+          "type": "string",
+          "description": "The name of the method parameter to which the thrown exception must be passed."
+        }
+      }
+    },
+    "advisorType": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "The unique identifier for an advisor."
+        },
+        "advice-ref": {
+          "type": "string",
+          "description": "A reference to an advice bean."
+        },
+        "pointcut": {
+          "type": "string",
+          "description": "A pointcut expression."
+        },
+        "pointcut-ref": {
+          "type": "string",
+          "description": "A reference to a pointcut definition."
+        },
+        "order": {
+          "type": "integer",
+          "description": "Controls the ordering of the execution of this advice when multiple advice executes at a specific joinpoint."
+        }
+      },
+      "required": ["advice-ref"]
+    }
+  }
+}
