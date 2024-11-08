@@ -425,7 +425,12 @@ export function declareWarning(
 ): void {
     aspectClass.addMethod({
         name: 'declareWarning',
-        statements: [`console.warn('declare warning : ${pointcut} : "${message}";');`],
+        statements: [
+            'const e = new Error();',
+            `const currentLine = e.stack.split('\\n')[2].split(':')[1];`,
+            `const currentColumn = e.stack.split('\\n')[2].split(':')[2];`,
+            `console.warn('declare warning : ${pointcut} : "${message}" at line ' + currentLine + ', column ' + currentColumn);`
+        ],
         returnType: 'void',
         kind: StructureKind.Method,
     });
@@ -448,7 +453,7 @@ export function declareError(
             'const e = new Error();',
             `const currentLine = e.stack.split('\\n')[2].split(':')[1];`,
             `const currentColumn = e.stack.split('\\n')[2].split(':')[2];`,
-            `console.error(new Error('PointcutError : ${pointcut} : "${message}";'));`
+            `console.error(new SyntaxError('PointcutError : ${pointcut} : "${message}";'));`
         ],
         returnType: 'void',
         kind: StructureKind.Method,
