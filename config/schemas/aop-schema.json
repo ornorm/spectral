@@ -289,6 +289,42 @@
         }
       },
       "required": ["advisor"]
+    },
+    "mixingAspectTypes": {
+      "type": "object",
+      "description": "Mixing Aspect Types",
+      "properties": {
+        "description": {
+          "type": "string",
+          "description": "It is perfectly possible to mix @AspectJ style aspects by using the auto-proxying support, schema-defined <aop:aspect> aspects, <aop:advisor> declared advisors, and even proxies and interceptors in other styles in the same configuration."
+        }
+      },
+      "required": ["description"]
+    },
+    "choosingAopDeclarationStyle": {
+      "type": "object",
+      "description": "Choosing which AOP Declaration Style to Use",
+      "properties": {
+        "proxyingMechanisms": {
+          "type": "object",
+          "properties": {
+            "jdkDynamicProxies": {
+              "type": "string",
+              "description": "Spring AOP uses either JDK dynamic proxies or CGLIB to create the proxy for a given target object. If the target object to be proxied implements at least one interface, a JDK dynamic proxy is used."
+            },
+            "cglibProxies": {
+              "type": "string",
+              "description": "If the target object does not implement any interfaces, a CGLIB proxy is created. To force the use of CGLIB proxies, set the value of the proxy-target-class attribute of the <aop:config> element to true."
+            },
+            "proxyTargetClass": {
+              "type": "string",
+              "description": "Using proxy-target-class=\"true\" on <tx:annotation-driven/>, <aop:aspectj-autoproxy/>, or <aop:config/> elements forces the use of CGLIB proxies for all three of them."
+            }
+          },
+          "required": ["jdkDynamicProxies", "cglibProxies", "proxyTargetClass"]
+        }
+      },
+      "required": ["proxyingMechanisms"]
     }
   },
   "definitions": {
