@@ -14,7 +14,7 @@ const project: Project = new Project();
 // Add a source file
 const sourceFile: SourceFile = project.createSourceFile("Aspects.ts", "", { overwrite: true });
 
-export function createAspectClass(
+function createAspectClass(
     name: string,
     isPrivileged: boolean,
     extendsClass?: string,
@@ -35,6 +35,7 @@ export function createAspectClass(
         implements: implementsInterfaces,
         kind: StructureKind.Class
     });
+
     if (isPrivileged) {
         aspectClass.addProperty({
             name: "privateField",
@@ -70,10 +71,15 @@ export function createAspectClass(
     return aspectClass;
 }
 
-// Example of creating aspects
-createAspectClass("ExampleAspect", true, "BaseClass", ["AdviceInterface"], "percflow(call(void Foo.m()))");
+// Example of creating aspects with various PerClause definitions
+createAspectClass("PertargetAspect", true, undefined, undefined, "pertarget(call(void Foo.m()))");
+createAspectClass("PerthisAspect", false, undefined, undefined, "perthis(call(void Foo.m()))");
+createAspectClass("PercflowAspect", false, undefined, undefined, "percflow(call(void Foo.m()))");
+createAspectClass("PercflowbelowAspect", false, undefined, undefined, "percflowbelow(call(void Foo.m()))");
+createAspectClass("PertypewithinAspect", false, undefined, undefined, "pertypewithin(Foo)");
+createAspectClass("IssingletonAspect", false, undefined, undefined, "issingleton()");
 
 // Save the source file
 project.save().then(() => {
-    console.log("Aspects.ts has been created");
+    console.log("Aspects.ts has been created with various PerClause definitions");
 });
