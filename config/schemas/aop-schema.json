@@ -112,6 +112,28 @@
             }
           },
           "required": ["id", "sourceList"]
+        },
+        "mapFactory": {
+          "type": "object",
+          "description": "The map factory to set on the bean.",
+          "properties": {
+            "id": {
+              "type": "string",
+              "description": "The unique identifier for the map factory."
+            },
+            "sourceMap": {
+              "type": "object",
+              "description": "The source map for the key-value pairs.",
+              "additionalProperties": {
+                "type": "string"
+              }
+            },
+            "mapClass": {
+              "type": "string",
+              "description": "The class of the map to instantiate."
+            }
+          },
+          "required": ["id", "sourceMap"]
         }
       },
       "required": ["id", "class"]
