@@ -237,6 +237,21 @@
         }
       },
       "required": ["pointcut", "advisor", "aspect", "arg-names"]
+    },
+    "adviceOrdering": {
+      "type": "object",
+      "description": "Advice Ordering",
+      "properties": {
+        "order": {
+          "type": "string",
+          "description": "The order in which advice methods are declared within the enclosing <aop:aspect> element."
+        },
+        "precedence": {
+          "type": "string",
+          "description": "The precedence between aspects is determined via the order attribute in the <aop:aspect> element or by using the @Order annotation."
+        }
+      },
+      "required": ["order", "precedence"]
     }
   },
   "definitions": {
