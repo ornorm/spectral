@@ -441,9 +441,15 @@ export function declareWarning(
  * declareError('call(Singleton.new(..))', 'bad construction');
  */
 export function declareError(aspectClass: ClassDeclaration, pointcut: string, message: string): void {
+
     aspectClass.addMethod({
         name: 'declareError',
-        statements: [`console.error(new Error('PointcutError : ${pointcut} : "${message}";'));`],
+        statements: [
+            'const e = new Error();',
+            `const currentLine = e.stack.split('\\n')[2].split(':')[1];`,
+            `const currentColumn = e.stack.split('\\n')[2].split(':')[2];`,
+            `console.error(new Error('PointcutError : ${pointcut} : "${message}";'));`
+        ],
         returnType: 'void',
         kind: StructureKind.Method,
     });
