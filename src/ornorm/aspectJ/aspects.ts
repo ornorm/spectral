@@ -35,10 +35,11 @@ where PerClause is one of
 
 /*
 Inter-type Member Declarations in aspects
+
 int Foo . m ( int i ) { ... }
     a method int m(int) owned by Foo, visible anywhere in the
-    defining package. In the body, this refers to the instance of Foo,
-    not the aspect.
+    defining package.
+    In the body, this refers to the instance of Foo, not the aspect.
 private int Foo . m ( int i ) throws IOException { ... }
     a method int m(int) that is declared to throw IOException, only
     visible in the defining aspect. In the body, this refers to the
@@ -283,24 +284,72 @@ export type PropertyForm<T = any> = T;
  * @see ConstructorDeclarationStructure
  * @see PropertyDeclarationStructure
  */
-export type MemberDeclarationsArray = Array<MethodDeclarationStructure | ConstructorDeclarationStructure | PropertyDeclarationStructure>;
+export type MemberDeclarationsArray =
+    Array<MethodDeclarationStructure | ConstructorDeclarationStructure | PropertyDeclarationStructure>;
 
 /**
  * Declares that the superclass of a given class is another class.
  *
- * @param className - The name of the class whose superclass is being declared.
+ * @param className - The name of the class whose superclass is
+ * being declared.
  * @param superClassName - The name of the superclass.
  *
  * @example
- * declareParentsExtends('C', 'D');
+ * declareParentsExtends(aspectClass, 'C', 'D');
+ * @throws ReferenceError if the class or superclass is not found.
+ * @see ClassDeclaration
  */
-export function declareParentsExtends(aspectClass: ClassDeclaration, className: string, superClassName: string): void {
+export function declareParentsExtends(
+    aspectClass: ClassDeclaration,
+    className: string,
+    superClassName: string
+): void {
+    // Add method to aspect class
     aspectClass.addMethod({
         name: 'declareParentsExtends',
-        statements: [`console.log('declare parents : ${className} extends ${superClassName};');`],
+        statements: [
+            // Check if the superclass extends the original superclass of the class
+            `if (!isLegalInheritance('${className}', '${superClassName}')) {`,
+            `    throw new TypeError('Inheritance is not legal: ${className} cannot extend ${superClassName}');`,
+            `}`,
+            // Log the declaration that class className extends superClassName
+            `console.log('declare parents : ${className} extends ${superClassName};');`
+        ],
         returnType: 'void',
         kind: StructureKind.Method,
     });
+}
+
+/**
+ * Checks if the inheritance is legal according to AspectJ specifications.
+ *
+ * @param className - The name of the class.
+ * @param superClassName - The name of the superclass.
+ * @returns  Returns true if the inheritance is legal, false otherwise.
+ * @throws ReferenceError if the class or superclass is not found.
+ */
+export function isLegalInheritance(className: string, superClassName: string): boolean {
+    const project: Project = new Project();
+    const sourceFiles: Array<SourceFile> = project.getSourceFiles();
+    let classDeclaration: ClassDeclaration | undefined;
+    let superClassDeclaration: ClassDeclaration | undefined;
+    // Find class declarations
+    sourceFiles.forEach((sourceFile: SourceFile) => {
+        const classDecl: ClassDeclaration | undefined =
+            sourceFile.getClass(className);
+        if (classDecl) classDeclaration = classDecl;
+        const superClassDecl: ClassDeclaration | undefined =
+            sourceFile.getClass(superClassName);
+        if (superClassDecl) superClassDeclaration = superClassDecl;
+    });
+    if (!classDeclaration || !superClassDeclaration) {
+        throw new ReferenceError(`Class ${className} or Superclass ${superClassName} not found.`);
+    }
+    // Get super class of both className and superClassName
+    const classSuperClass: string | undefined = classDeclaration.getExtends()?.getType().getText();
+    const superClassSuperClass: string | undefined = superClassDeclaration.getExtends()?.getType().getText();
+    // Check if superClassName extends the original superclass of className
+    return classSuperClass === superClassSuperClass;
 }
 
 /**
