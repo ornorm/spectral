@@ -69,9 +69,36 @@ general form:
  */
 
 // Type Aliases for Method Shapes
-export type MethodForm1<T = any, R = any> = (value: T) => R;
-export type MethodForm2<T = any, R = any> = (value: T) => R;
+
+/**
+ * Type alias for an abstract method form.
+ * Represents an abstract method that takes a value of type T and returns a value of type R.
+ *
+ * @template T - The type of the input value.
+ * @template R - The type of the return value.
+ */
+export type AbstractMethodForm<T = any, R = any> = abstract new (value: T) => R;
+/**
+ * Type alias for a constructor form.
+ * Represents a constructor that takes a variable number of arguments of type T and returns an instance of type T.
+ *
+ * @template T - The type of the constructor arguments and the return value.
+ */
 export type ConstructorForm<T = any> = new (...args: T[]) => T;
+/**
+ * Type alias for a method form.
+ * Represents a method that takes a value of type T and returns a value of type R.
+ *
+ * @template T - The type of the input value.
+ * @template R - The type of the return value.
+ */
+export type MethodForm<T = any, R = any> = (value: T) => R;
+/**
+ * Type alias for a property form.
+ * Represents a property of type T.
+ *
+ * @template T - The type of the property.
+ */
 export type PropertyForm<T = any> = T;
 
 // Create a new project using ts-morph
@@ -80,15 +107,19 @@ const project: Project = new Project();
 const sourceFile: SourceFile = project.createSourceFile('Aspects.ts', '', { overwrite: true });
 
 /**
- * Validates and adds general inter-type forms to the aspect class.
- * @param aspectClass - The aspect class to which the inter-type forms
- * are added.
+ * Validates and adds general `inter-type` forms to the aspect class.
+ * @param aspectClass - The aspect class to which the `inter-type`
+ * forms are added.
  * @param members - The array of member declarations (methods,
  * constructors, and fields) to add to the aspect.
+ * @see ClassDeclaration
+ * @see MethodDeclarationStructure
+ * @see ConstructorDeclarationStructure
+ * @see PropertyDeclarationStructure
  */
 export function addInterTypeMember(
     aspectClass: ClassDeclaration,
-    members: (MethodDeclarationStructure | ConstructorDeclarationStructure | PropertyDeclarationStructure)[]
+    members: Array<MethodDeclarationStructure | ConstructorDeclarationStructure | PropertyDeclarationStructure>
 ): void {
     for (const member of members) {
         if (member.kind === StructureKind.Method) {
@@ -116,15 +147,22 @@ export function addInterTypeMember(
 }
 
 /**
- * Creates an aspect class with the specified properties and inter-type member declarations.
+ * Creates an aspect class with the specified properties and `inter-type`
+ * member declarations.
  * @param name - The name of the aspect class.
- * @param isPrivileged - Indicates if the aspect is privileged (can access private fields and methods).
+ * @param isPrivileged - Indicates if the aspect is privileged (can access
+ * private fields and methods).
  * @param extendsClass - The class that this aspect extends (if any).
- * @param implementsInterfaces - The interfaces that this aspect implements (if any).
+ * @param implementsInterfaces - The interfaces that this aspect
+ * implements (if any).
  * @param perClause - The PerClause definition for the aspect (if any).
- * @param members - The array of member declarations (methods, constructors, and fields) to add to the aspect.
+ * @param members - The array of member declarations (methods,
+ * constructors, and fields) to add to the aspect.
  * @returns The created aspect class.
  * @see ClassDeclaration
+ * @see MethodDeclarationStructure
+ * @see ConstructorDeclarationStructure
+ * @see PropertyDeclarationStructure
  */
 export function createAspectClass(
     name: string,
@@ -132,7 +170,7 @@ export function createAspectClass(
     extendsClass?: string,
     implementsInterfaces?: string[],
     perClause?: string,
-    members?: (MethodDeclarationStructure | ConstructorDeclarationStructure | PropertyDeclarationStructure)[]
+    members?: Array<MethodDeclarationStructure | ConstructorDeclarationStructure | PropertyDeclarationStructure>
 ): ClassDeclaration {
     // Add a class declaration to the source file
     const aspectClass: ClassDeclaration = sourceFile.addClass({
