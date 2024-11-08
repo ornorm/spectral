@@ -200,6 +200,10 @@
             "finally": {
               "type": "string",
               "description": "The method providing the body of the after (finally) advice."
+            },
+            "around": {
+              "type": "string",
+              "description": "The method providing the body of the around advice."
             }
           },
           "required": ["id", "method"]
