@@ -44,7 +44,18 @@
         },
         "load-time-weaver": {
           "type": "object",
-          "description": "Enable load-time weaving with AspectJ."
+          "description": "Enable the Spring Framework’s LTW support.",
+          "properties": {
+            "class": {
+              "type": "string",
+              "description": "The class name of the LoadTimeWeaver implementation."
+            },
+            "weaver-class": {
+              "type": "string",
+              "description": "The fully qualified class name of the LoadTimeWeaver implementation."
+            }
+          },
+          "required": ["class", "weaver-class"]
         },
         "spring-configured": {
           "type": "object",
@@ -53,17 +64,6 @@
         "mbean-export": {
           "type": "object",
           "description": "Enable annotation-based MBean export."
-        },
-        "load-time-weaver": {
-          "type": "object",
-          "description": "Enable the Spring Framework’s LTW support.",
-          "properties": {
-            "class": {
-              "type": "string",
-              "description": "The class name of the LoadTimeWeaver implementation."
-            }
-          },
-          "required": ["class"]
         }
       },
       "required": ["component-scan", "annotation-config", "property-placeholder", "load-time-weaver", "spring-configured", "mbean-export"]
