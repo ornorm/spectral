@@ -323,31 +323,26 @@ export function declareParentsExtends(
 /**
  * Checks if the inheritance is legal according to AspectJ specifications.
  *
+ * @param aspectClass - The class to check.
  * @param className - The name of the class.
  * @param superClassName - The name of the superclass.
  * @returns  Returns true if the inheritance is legal, false otherwise.
  * @throws ReferenceError if the class or superclass is not found.
  */
-export function isLegalInheritance(className: string, superClassName: string): boolean {
-    const project: Project = new Project();
-    const sourceFiles: Array<SourceFile> = project.getSourceFiles();
-    let classDeclaration: ClassDeclaration | undefined;
-    let superClassDeclaration: ClassDeclaration | undefined;
-    // Find class declarations
-    sourceFiles.forEach((sourceFile: SourceFile) => {
-        const classDecl: ClassDeclaration | undefined =
-            sourceFile.getClass(className);
-        if (classDecl) classDeclaration = classDecl;
-        const superClassDecl: ClassDeclaration | undefined =
-            sourceFile.getClass(superClassName);
-        if (superClassDecl) superClassDeclaration = superClassDecl;
-    });
+export function isLegalInheritance(aspectClass: ClassDeclaration, className: string, superClassName: string): boolean {
+    // Find class declarations within the provided aspect class
+    let classDeclaration: ClassDeclaration | undefined =
+        aspectClass.getSourceFile().getClass(className);
+    let superClassDeclaration: ClassDeclaration | undefined =
+        aspectClass.getSourceFile().getClass(superClassName);
     if (!classDeclaration || !superClassDeclaration) {
         throw new ReferenceError(`Class ${className} or Superclass ${superClassName} not found.`);
     }
     // Get super class of both className and superClassName
-    const classSuperClass: string | undefined = classDeclaration.getExtends()?.getType().getText();
-    const superClassSuperClass: string | undefined = superClassDeclaration.getExtends()?.getType().getText();
+    const classSuperClass: string | undefined =
+        classDeclaration.getExtends()?.getType().getText();
+    const superClassSuperClass: string | undefined =
+        superClassDeclaration.getExtends()?.getType().getText();
     // Check if superClassName extends the original superclass of className
     return classSuperClass === superClassSuperClass;
 }
@@ -382,23 +377,17 @@ export function declareParentsImplements(
 /**
  * Checks if the class implements the given interfaces.
  *
+ * @param aspectClass - The class to check.
  * @param className The name of the class.
  * @param interfaces The interfaces that the class should implement.
  * @returns  Returns true if the class implements the interfaces, false
  * otherwise.
  * @throws ReferenceError if the class is not found.
  */
-function areInterfacesImplemented(
-    className: string, interfaces: Array<string>): boolean {
-    const project = new Project();
-    const sourceFiles: Array<SourceFile> = project.getSourceFiles();
-    let classDeclaration: ClassDeclaration | undefined;
-    // Find class declaration
-    sourceFiles.forEach((sourceFile: SourceFile) => {
-        const classDecl: ClassDeclaration | undefined =
-            sourceFile.getClass(className);
-        if (classDecl) classDeclaration = classDecl;
-    });
+export function areInterfacesImplemented(aspectClass: ClassDeclaration, className: string, interfaces: string[]): boolean {
+    // Find class declaration within the provided aspect class
+    let classDeclaration: ClassDeclaration | undefined =
+        aspectClass.getSourceFile().getClass(className);
     if (!classDeclaration) {
         throw new ReferenceError(`Class ${className} not found.`);
     }
@@ -407,9 +396,8 @@ function areInterfacesImplemented(
         classDeclaration.getImplements().map(
             (impl: ExpressionWithTypeArguments) => impl.getText());
     // Check if all given interfaces are implemented by the class
-    return interfaces.every(
-        (interfaceName: string) =>
-            implementedInterfaces.includes(interfaceName));
+    return interfaces.every((interfaceName: string) =>
+        implementedInterfaces.includes(interfaceName));
 }
 
 /**
@@ -424,7 +412,7 @@ function areInterfacesImplemented(
 export function declareWarning(aspectClass: ClassDeclaration, pointcut: string, message: string): void {
     aspectClass.addMethod({
         name: 'declareWarning',
-        statements: [`console.log('declare warning : ${pointcut} : "${message}";');`],
+        statements: [`console.warn('declare warning : ${pointcut} : "${message}";');`],
         returnType: 'void',
         kind: StructureKind.Method,
     });
@@ -634,7 +622,10 @@ export function createAspectClass(name: string, isPrivileged: boolean, extendsCl
 }
 
 // Example usage
-const exampleClass: ClassDeclaration = sourceFile.addClass({ name: 'ExampleAspect', isAbstract: false, kind: StructureKind.Class });
+const exampleClass: ClassDeclaration =
+    sourceFile.addClass({
+        name: 'ExampleAspect', isAbstract: false, kind: StructureKind.Class
+    });
 declareParentsExtends(exampleClass, 'C', 'D');
 declareParentsImplements(exampleClass, 'C', ['I', 'J']);
 declareWarning(exampleClass, 'set(* Point.*) && !within(Point)', 'bad set');
