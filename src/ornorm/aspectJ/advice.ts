@@ -64,7 +64,7 @@ const sourceFile: SourceFile = project.createSourceFile('advice.ts', '', { overw
  * @param body - The body of the advice.
  * @returns The created advice method.
  */
-function createAdvice(
+export function createAdvice(
     name: string,
     type: 'before' | 'after' | 'around',
     formals: string,

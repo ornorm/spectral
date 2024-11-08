@@ -33,6 +33,37 @@ where PerClause is one of
     issingleton ()
  */
 
+/*
+Inter-type Member Declarations in aspects
+int Foo . m ( int i ) { ... }
+    a method int m(int) owned by Foo, visible anywhere in the
+    defining package. In the body, this refers to the instance of Foo,
+    not the aspect.
+private int Foo . m ( int i ) throws IOException { ... }
+    a method int m(int) that is declared to throw IOException, only
+    visible in the defining aspect. In the body, this refers to the
+    instance of Foo, not the aspect.
+abstract int Foo . m ( int i ) ;
+    an abstract method int m(int) owned by Foo
+Point . new ( int x, int y ) { ... }
+    a constructor owned by Point. In the body, this refers to the new
+    Point, not the aspect.
+private static int Point . x ;
+    a static int field named x owned by Point and visible only in the
+    declaring aspect
+private int Point . x = foo() ;
+    a non-static field initialized to the result of calling foo(). In the
+    initializer, this refers to the instance of Foo, not the aspect.
+
+general form:
+    [ Modifiers ] Type Type . Id ( Formals )
+        [ throws TypeList ] { Body }
+    abstract [ Modifiers ] Type Type . Id ( Formals )
+        [ throws TypeList ] ;
+    [ Modifiers ] Type . new ( Formals )
+        [ throws TypeList ] { Body }
+    [ Modifiers ] Type Type . Id [ = Expression ] ;
+ */
 
 // Create a new project using ts-morph
 const project: Project = new Project();
