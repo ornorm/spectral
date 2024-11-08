@@ -164,6 +164,36 @@
         }
       },
       "required": ["pointcut"]
+    },
+    "declaringAdvice": {
+      "type": "object",
+      "description": "Declaring Advice",
+      "properties": {
+        "advice": {
+          "type": "object",
+          "description": "The schema-based AOP support uses five kinds of advice: Before, After, After Returning, After Throwing, and Around.",
+          "properties": {
+            "id": {
+              "type": "string",
+              "description": "The unique identifier for the advice."
+            },
+            "pointcut-ref": {
+              "type": "string",
+              "description": "Reference to a named pointcut."
+            },
+            "pointcut": {
+              "type": "string",
+              "description": "Inline pointcut expression."
+            },
+            "method": {
+              "type": "string",
+              "description": "The method providing the body of the advice."
+            }
+          },
+          "required": ["id", "method"]
+        }
+      },
+      "required": ["advice"]
     }
   },
   "definitions": {
