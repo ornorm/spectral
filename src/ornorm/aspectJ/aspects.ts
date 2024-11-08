@@ -443,7 +443,7 @@ export function declareWarning(
 export function declareError(aspectClass: ClassDeclaration, pointcut: string, message: string): void {
     aspectClass.addMethod({
         name: 'declareError',
-        statements: [`console.log('declare error : ${pointcut} : "${message}";');`],
+        statements: [`console.error(new Error('PointcutError : ${pointcut} : "${message}";'));`],
         returnType: 'void',
         kind: StructureKind.Method,
     });
