@@ -19,7 +19,7 @@
  */
 
 import {
-    ClassFilter, JoinPointTarget, Method, MethodMatcher, Type
+    JoinPointTarget, Method, PointcutHandler, Type
 } from '@ornorm/spectral';
 
 /**
@@ -45,10 +45,9 @@ export type SelectorType = 'class' | 'method' | 'parameters';
  * Class representing a method matcher.
  *
  * Implements the MethodMatcher interface.
- * @see ClassFilter
- * @see MethodMatcher
+ * @see PointcutHandler
  */
-export class PointcutSelector implements ClassFilter, MethodMatcher {
+export class PointcutSelector implements PointcutHandler {
     protected isStaticPointcut: boolean = false;
     protected readonly selector: string;
     protected target: SelectorTarget | null = null;
@@ -213,7 +212,8 @@ export class PointcutSelector implements ClassFilter, MethodMatcher {
     protected isAssignableFrom<T = any>(type: Type<T>): boolean {
         const specifiedType: string = this.selector.slice(1);
         const targetType: Type = Reflect.getMetadata('design:type', type);
-        return targetType && targetType.prototype && targetType.prototype.isPrototypeOf(specifiedType);
+        return targetType && targetType.prototype &&
+            targetType.prototype.isPrototypeOf(specifiedType);
     }
 
     /**

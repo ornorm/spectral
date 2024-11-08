@@ -27,7 +27,7 @@ import {
     Around,
     AspectConfig,
     Before,
-    Disposable,
+    Disposable, Method,
     PointcutConfig
 } from '@ornorm/spectral';
 
@@ -309,6 +309,9 @@ export class Weaver {
     private static exposeProxy: boolean = false;
     private static proxies: ProxyFactory[] = [];
 
+    /**
+     * Prevents instantiation of the Weaver class.
+     */
     private constructor() {}
 
     /**
@@ -327,6 +330,25 @@ export class Weaver {
                 config.pointcuts?.forEach((pointcutConfig: PointcutConfig) =>
                     Weaver.pointcuts.set(pointcutConfig.id, pointcutConfig.expression)
                 );
+                if (config.advisors) {
+                    for (const advisorConfig of config.advisors) {
+                        const pointcutExpression: string = advisorConfig.pointcut.pattern;
+                        const adviceMethod: string = advisorConfig.advice.method;
+                        const aspectModule: any = await import(`./${advisorConfig.advice.type}`);
+                        const adviceFunction: Method | undefined =
+                            Reflect.get(aspectModule.default.prototype, adviceMethod);
+                        if (!adviceFunction) {
+                            throw new ReferenceError(`Method ${adviceMethod} not found in advisor ${advisorConfig.id}`);
+                        }
+                        Weaver.pointcuts.set(advisorConfig.pointcut.id, pointcutExpression);
+                        Weaver.weave(adviceFunction, {
+                            id: advisorConfig.id,
+                            ref: advisorConfig.advice.type,
+                            advices: [advisorConfig.advice],
+                            pointcuts: [advisorConfig.pointcut]
+                        });
+                    }
+                }
                 const sortedAspects: Array<AspectConfig> =
                     config.aspects.sort(
                         (a: AspectConfig, b: AspectConfig) =>

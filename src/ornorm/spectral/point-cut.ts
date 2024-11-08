@@ -106,26 +106,40 @@ export function isMethodMatcher(obj: any): obj is MethodMatcher {
 }
 
 /**
- * Pointcut model enables pointcut reuse independent of advice types.
+ * Pointcut handlers enables pointcut reuse independent of advice types.
  *
  * You can target different advice with the same pointcut.
  *
  * The pointcut interface is the central interface, used to target advice
  * to particular classes and methods.
+ * @see ClassFilter
+ * @see MethodMatcher
  */
-export interface PointcutModel {
+export interface PointcutHandler extends ClassFilter, MethodMatcher {
     /**
-     * The class filter used to restrict the pointcut to a given set of target
-     * classes.
-     * @see ClassFilter
+     * Checks if the selector is for a class.
      */
-    classFilter?: ClassFilter;
+    readonly isClassSelector: boolean;
     /**
-     * The method matcher used to restrict the pointcut to a given set of
-     * target methods.
-     * @see MethodMatcher
+     * Checks if the selector is for a method.
      */
-    methodMatcher?: MethodMatcher;
+    readonly isMethodSelector: boolean;
+    /**
+     * Checks if the selector matches all targets.
+     */
+    readonly isSelectingAll: boolean
+    /**
+     * Checks if the selector matches by instance.
+     */
+    readonly isSelectingByInstance: boolean;
+    /**
+     * Checks if the selector matches by type.
+     */
+    readonly isSelectingByType: boolean;
+    /**
+     * Checks if the selector matches by ID.
+     */
+    readonly isSelectingById: boolean;
 }
 
 /**
