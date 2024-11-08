@@ -51,6 +51,30 @@
               }
             ]
           }
+        },
+        "constructorArgs": {
+          "type": "array",
+          "description": "The constructor arguments for the bean.",
+          "items": {
+            "oneOf": [
+              {
+                "type": "string"
+              },
+              {
+                "$ref": "#/definitions/bean"
+              },
+              {
+                "type": "object",
+                "properties": {
+                  "static-field": {
+                    "type": "string",
+                    "description": "The static field to inject."
+                  }
+                },
+                "required": ["static-field"]
+              }
+            ]
+          }
         }
       },
       "required": ["id", "class"]
