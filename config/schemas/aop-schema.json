@@ -252,6 +252,43 @@
         }
       },
       "required": ["order", "precedence"]
+    },
+    "aspectInstantiationModels": {
+      "type": "object",
+      "description": "Aspect Instantiation Models",
+      "properties": {
+        "singleton": {
+          "type": "string",
+          "description": "The only supported instantiation model for schema-defined aspects is the singleton model."
+        }
+      },
+      "required": ["singleton"]
+    },
+    "advisors": {
+      "type": "object",
+      "description": "Advisors",
+      "properties": {
+        "advisor": {
+          "type": "object",
+          "description": "The concept of 'advisors' comes from the AOP support defined in Spring and does not have a direct equivalent in AspectJ.",
+          "properties": {
+            "pointcut-ref": {
+              "type": "string",
+              "description": "Reference to a named pointcut."
+            },
+            "advice-ref": {
+              "type": "string",
+              "description": "Reference to the advice bean."
+            },
+            "order": {
+              "type": "string",
+              "description": "The order attribute to define the Ordered value of the advisor."
+            }
+          },
+          "required": ["pointcut-ref", "advice-ref"]
+        }
+      },
+      "required": ["advisor"]
     }
   },
   "definitions": {
