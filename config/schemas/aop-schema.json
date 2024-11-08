@@ -142,6 +142,28 @@
         }
       },
       "required": ["aspect", "bean"]
+    },
+    "declaringPointcut": {
+      "type": "object",
+      "description": "Declaring a Pointcut",
+      "properties": {
+        "pointcut": {
+          "type": "object",
+          "description": "A pointcut that represents the execution of any business service in the service layer.",
+          "properties": {
+            "id": {
+              "type": "string",
+              "description": "The unique identifier for the pointcut."
+            },
+            "expression": {
+              "type": "string",
+              "description": "The pointcut expression."
+            }
+          },
+          "required": ["id", "expression"]
+        }
+      },
+      "required": ["pointcut"]
     }
   },
   "definitions": {
