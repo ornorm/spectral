@@ -134,6 +134,28 @@
             }
           },
           "required": ["id", "sourceMap"]
+        },
+        "setFactory": {
+          "type": "object",
+          "description": "The set factory to set on the bean.",
+          "properties": {
+            "id": {
+              "type": "string",
+              "description": "The unique identifier for the set factory."
+            },
+            "sourceSet": {
+              "type": "array",
+              "description": "The source set for the values.",
+              "items": {
+                "type": "string"
+              }
+            },
+            "setClass": {
+              "type": "string",
+              "description": "The class of the set to instantiate."
+            }
+          },
+          "required": ["id", "sourceSet"]
         }
       },
       "required": ["id", "class"]
