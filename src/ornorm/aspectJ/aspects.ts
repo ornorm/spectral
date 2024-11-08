@@ -32,6 +32,7 @@ where PerClause is one of
     pertypewithin( TypePattern )
     issingleton ()
  */
+
 /*
 Inter-type Member Declarations in aspects
 int Foo . m ( int i ) { ... }
@@ -62,6 +63,7 @@ general form:
         [ throws TypeList ] { Body }
     [ Modifiers ] Type Type . Id [ = Expression ] ;
  */
+
 /*
 Other Inter-type Declarations in aspects
 declare parents : C extends D;
@@ -104,6 +106,141 @@ general form
     declare @constructor: ConstructorPat : Annotation;
     declare @field : FieldPat : Annotation;
  */
+
+/*
+Primitive Pointcuts
+
+call ( void Foo.m(int) )
+    a call to the method void Foo.m(int)
+call ( Foo.new(..) )
+    a call to any constructor of Foo
+execution ( * Foo.*(..) throws IOException )
+    the execution of any method of Foo that is declared to throw
+    IOException
+execution ( !public Foo .new(..) )
+    the execution of any non-public constructor of Foo
+initialization ( Foo.new(int) )
+    the initialization of any Foo object that is started with the
+    constructor Foo(int)
+preinitialization ( Foo.new(int) )
+    the pre-initialization (before the super constructor is called) that
+    is started with the constructor Foo(int)
+staticinitialization( Foo )
+    when the type Foo is initialized, after loading
+get ( int Point.x )
+    when int Point.x is read
+set ( !private * Point.* )
+    when any non-private field of Point is assigned
+handler ( IOException+ )
+    when an IOException or its subtype is handled with a catch block
+adviceexecution()
+    the execution of all advice bodies
+within ( com.bigboxco.* )
+    any join point where the associated code is defined in the
+    package com.bigboxco
+withincode ( void Figure.move() )
+    any join point where the associated code is defined in the method
+    void Figure.move()
+withincode ( com.bigboxco.*.new(..) )
+    any join point where the associated code is defined in any
+    constructor in the package com.bigoxco.
+cflow ( call(void Figure.move()) )
+    any join point in the control flow of each call to void
+    Figure.move(). This includes the call itself.
+cflowbelow ( call(void Figure.move()) )
+    any join point below the control flow of each call to void
+    Figure.move(). This does not include the call.
+if ( Tracing.isEnabled() )
+    any join point where Tracing.isEnabled() is true. The boolean
+    expression used can only access static members, variables bound
+    in the same pointcut, and thisJoinPoint forms.
+this ( Point )
+    any join point where the currently executing object is an instance
+    of Point
+target ( java.io.InputPort )
+    any join point where the target object is an instance of
+    java.io.InputPort
+args ( java.io.InputPort, int )
+    any join point where there are two arguments, the first an
+    instance of java.io.InputPort, and the second an int
+args ( *, int )
+    any join point where there are two arguments, the second of
+    which is an int.
+args ( short, .., short )
+    any join point with at least two arguments, the first and last of
+    which are shorts
+    Note: any position in this, target, and args can be replaced with a
+    variable bound in the advice or pointcut.
+@this( SomeAnnotation )
+    any join point where the type of the currently executing object
+    has an annotation of type SomeAnnotation
+@target( SomeAnnotation )
+    any join point where the type of the target object has an
+    annotation of type SomeAnnotation
+@args(SomeAnnotation)
+    any join point where there is one argument, and the type of the
+    argument has an annotation of type SomeAnnotation
+@args(*,SomeAnnotation)
+    any join point where there are two arguments, the type of the
+    second having an annotation of type SomeAnnotation
+@args(SomeAnnotation,..,SomeOtherAnnotation)
+    any join point with at least three arguments, the type of the first
+    having an annotation of type SomeAnnotation, and the type of the
+    last having an annotation of type SomeOtherAnnotation
+@within(SomeAnnotation)
+    any join point where the associated code is defined in a type with
+    an annotation of type SomeAnnotation
+@withincode(SomeAnnotation)
+    any join point where the associated code is defined in a method
+    or constructor with an annotation of type SomeAnnotation
+@annotation(SomeAnnotation)
+    any join point where the subject has an annotation of type
+    SomeAnnotation
+    Note: any position in an “@xxx” pointcut can be replaced with a
+    variable bound in the advice or pointcut.
+general form:
+    call(MethodPat)
+    call(ConstructorPat)
+    execution(MethodPat)
+    execution(ConstructorPat)
+    initialization(ConstructorPat)
+    preinitialization(ConstructorPat)
+    staticinitialization(TypePat)
+    get(FieldPat)
+    set(FieldPat)
+    handler(TypePat)
+    adviceexecution()
+    within(TypePat)
+    withincode(MethodPat)
+    withincode(ConstructorPat)
+    cflow(Pointcut)
+    cflowbelow(Pointcut)
+    if(Expression)
+    this(Type | Var)
+    target(Type | Var)
+    args(Type | Var , …)
+    @this(Type|Var)
+    @target(Type|Var)
+    @args(Type|Var, …)
+    @within(Type|Var)
+    @withincode(Type|Var)
+    @annotation(Type|Var)
+
+where MethodPat is:
+    [ModifiersPat] TypePat [TypePat . ] IdPat ( TypePat | .., … )
+        [ throws ThrowsPat ]
+ConstructorPat is:
+    [ModifiersPat ] [TypePat . ] new ( TypePat | .. , …)
+        [ throws ThrowsPat ]
+FieldPat is:
+    [ModifiersPat] TypePat [TypePat . ] IdPat
+TypePat is one of:
+    IdPat [ + ] [ [] … ]
+    ! TypePat
+    TypePat && TypePat
+    TypePat || TypePat
+    ( TypePat )
+*/
 
 /**
  * Type alias for an abstract method form.
