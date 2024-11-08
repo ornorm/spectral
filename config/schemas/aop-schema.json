@@ -79,6 +79,32 @@
           }
         }
       }
+    },
+    "schemaBasedAop": {
+      "type": "object",
+      "description": "Schema-based AOP Support",
+      "properties": {
+        "config": {
+          "type": "object",
+          "description": "Within your Spring configurations, all aspect and advisor elements must be placed within an <aop:config> element.",
+          "properties": {
+            "pointcut": {
+              "type": "string",
+              "description": "Pointcut expressions and advice kinds."
+            },
+            "advisor": {
+              "type": "string",
+              "description": "Advisor elements within <aop:config>."
+            },
+            "aspect": {
+              "type": "string",
+              "description": "Aspect elements within <aop:config>."
+            }
+          },
+          "required": ["pointcut", "advisor", "aspect"]
+        }
+      },
+      "required": ["config"]
     }
   },
   "definitions": {
