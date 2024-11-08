@@ -55,11 +55,11 @@ export class PointcutSelector implements PointcutHandler {
 
     /**
      * Constructs a new `PointcutSelector`.
-     * @param selector The selector string used to match methods or classes.
-     * @param isStaticPointcut Indicates if the pointcut is evaluated at runtime.
+     * @param expression The selector string used to match methods or classes.
+     * @param isStaticPointcut Indicates if the expression is evaluated at runtime.
      */
-    constructor(selector: string, isStaticPointcut: boolean = false) {
-        this.selector = selector;
+    constructor(expression: string, isStaticPointcut: boolean = true) {
+        this.selector = expression;
         this.isStaticPointcut = isStaticPointcut;
         this.determineSelectorTarget();
     }
@@ -79,7 +79,7 @@ export class PointcutSelector implements PointcutHandler {
     }
 
     /**
-     * Indicates whether the pointcut is evaluated at runtime.
+     * Indicates whether the expression is evaluated at runtime.
      */
     public get isRuntime(): boolean {
         return this.isStaticPointcut;
@@ -161,7 +161,7 @@ export class PointcutSelector implements PointcutHandler {
         let matchMethod: boolean = false;
         let matchType: boolean = false;
         if (this.isRuntime) {
-            // Runtime pointcut: consider method arguments
+            // Runtime expression: consider method arguments
             if (args.length >= 2) {
                 if (this.isSelectingById) {
                     matchType = this.matchId(type);
@@ -177,7 +177,7 @@ export class PointcutSelector implements PointcutHandler {
                 matchMethod = this.matchPointcut(method);
             }
         } else {
-            // Static pointcut: do not consider method arguments
+            // Static expression: do not consider method arguments
             matchMethod = this.matchPointcut(method);
         }
         // Check if the method arguments match the specified criteria
@@ -217,7 +217,7 @@ export class PointcutSelector implements PointcutHandler {
     }
 
     /**
-     *  Check if this pointcut ever matches the given method on a target class.
+     *  Check if this expression ever matches the given method on a target class.
      * @param method The method to check against the matcher criteria.
      * @param type The class to check against the method.
      * @returns True if the method matches the criteria, otherwise false.

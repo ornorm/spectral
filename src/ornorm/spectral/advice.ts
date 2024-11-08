@@ -25,8 +25,39 @@ import {
     isMethodMatcher,
     JoinPoint,
     Method,
-    MethodMatcher, Type
+    MethodMatcher, PointcutExpression, Type
 } from '@ornorm/spectral';
+
+/**
+ * Retrieves the matching advisor for a given target, method, and type.
+ * @param target - The target object.
+ * @param method - The method to match.
+ * @param type - The type of the target object.
+ * @returns The matching Advisor if found, otherwise undefined.
+ * @see Method
+ * @see Type
+ */
+export function getMatchingAdvisor<T extends object = any>(
+    target: any, method: Method, type: Type<T>
+): Advisor | undefined {
+    const advisors: Array<Advisor> =
+        Reflect.getMetadata('advisors', target.constructor) || [];
+    for (const advisor of advisors) {
+        if (advisor.isMethodAdvice) {
+            const matcher: MethodMatcher = advisor.expression as MethodMatcher;
+            if (matcher.matches(method, type)) {
+                return advisor;
+            }
+        }
+        if (advisor.isClassAdvice) {
+            const filter: ClassFilter = advisor.expression as ClassFilter;
+            if (filter.filter(type)) {
+                return advisor;
+            }
+        }
+    }
+    return undefined
+}
 
 /**
  * The type of advice that can be applied.
@@ -49,21 +80,21 @@ export type Advice = Function | Method;
  */
 export class Advisor {
     private readonly privateAdvice: Advice;
-    private readonly privatePointcut: ClassFilter | MethodMatcher;
+    private readonly privateExpression: PointcutExpression;
     private matchJoinPoint: boolean = false;
 
     /**
      * Creates an instance of Advisor.
      * @param advice - The advice function or method to be applied.
-     * @param pointcut - The pointcut expression defining where the advice
+     * @param expression - The expression defining where the advice
      * should be applied.
      * @see Advice
      * @see ClassFilter
      * @see MethodMatcher
      */
-    constructor(advice: Advice, pointcut: ClassFilter | MethodMatcher) {
+    constructor(advice: Advice, expression: PointcutExpression) {
         this.privateAdvice = advice;
-        this.privatePointcut = pointcut;
+        this.privateExpression = expression;
     }
 
     /**
@@ -74,6 +105,9 @@ export class Advisor {
         return this.privateAdvice;
     }
 
+    /**
+     * Gets the executed status of the advice.
+     */
     public get executed(): boolean {
         return this.matchJoinPoint;
     }
@@ -83,29 +117,28 @@ export class Advisor {
     }
 
     /**
+     * Gets the expression.
+     * @returns The expression which can be a `ClassFilter` or
+     * `MethodMatcher`.
+     * @see PointcutExpression
+     */
+    public get expression(): PointcutExpression {
+        return this.privateExpression;
+    }
+
+    /**
      * Checks if the advice is applied to a class.
      * @returns True if the advice is applied to a class, false otherwise.
      */
     public get isClassAdvice(): boolean {
-        return isClassFilter(this.pointcut);
+        return isClassFilter(this.expression);
     }
 
     /**
      * Checks if the advice is applied to a method.
      */
     public get isMethodAdvice(): boolean {
-        return isMethodMatcher(this.pointcut);
-    }
-
-    /**
-     * Gets the pointcut expression.
-     * @returns The pointcut expression which can be a `ClassFilter` or
-     * `MethodMatcher`.
-     * @see ClassFilter
-     * @see MethodMatcher
-     */
-    public get pointcut(): ClassFilter | MethodMatcher {
-        return this.privatePointcut;
+        return isMethodMatcher(this.expression);
     }
 
     /**
@@ -120,14 +153,14 @@ export class Advisor {
     ): any {
         this.executed = false;
         if (
-            isClassFilter(this.pointcut) &&
-            this.pointcut.filter(joinPoint.type)
+            isClassFilter(this.expression) &&
+            this.expression.filter(joinPoint.type)
         ) {
             this.executed = true;
             return this.advice.call(joinPoint.scope, ...args);
         } else if (
-            isMethodMatcher(this.pointcut) &&
-            this.pointcut.matches(joinPoint.method, joinPoint.type, joinPoint.args)
+            isMethodMatcher(this.expression) &&
+            this.expression.matches(joinPoint.method, joinPoint.type, joinPoint.args)
         ) {
             this.executed = true;
             return this.advice.call(joinPoint.scope, ...args);
@@ -137,39 +170,8 @@ export class Advisor {
 }
 
 /**
- * Retrieves the matching advisor for a given target, method, and type.
- * @param target - The target object.
- * @param method - The method to match.
- * @param type - The type of the target object.
- * @returns The matching Advisor if found, otherwise undefined.
- * @see Method
- * @see Type
- */
-export function getMatchingAdvisor<T extends object = any>(
-    target: any, method: Method, type: Type<T>
-): Advisor | undefined {
-    const advisors: Array<Advisor> =
-        Reflect.getMetadata('advisors', target.constructor) || [];
-    for (const advisor of advisors) {
-        if (advisor.isMethodAdvice) {
-            const matcher: MethodMatcher = advisor.pointcut as MethodMatcher;
-            if (matcher.matches(method, type)) {
-                return advisor;
-            }
-        }
-        if (advisor.isClassAdvice) {
-            const filter: ClassFilter = advisor.pointcut as ClassFilter;
-            if (filter.filter(type)) {
-                return advisor;
-            }
-        }
-    }
-    return undefined
-}
-
-/**
  * Decorator to define a before advice.
- * @param pointcut - The pointcut expression.
+ * @param pointcut - The expression expression.
  * @returns A method decorator to apply the before advice.
  * @see MethodDecorator
  */
@@ -218,7 +220,7 @@ export function Before(pointcut: string, argNames?: string): MethodDecorator {
 
 /**
  * Decorator to define an after returning advice.
- * @param pointcut - The pointcut expression.
+ * @param pointcut - The expression expression.
  * @param argNames - The argument names.
  * @returns A method decorator to apply the after returning advice.
  * @see MethodDecorator
@@ -268,7 +270,7 @@ export function AfterReturning(pointcut: string, argNames?: string): MethodDecor
 
 /**
  * Decorator to define an after throwing advice.
- * @param pointcut - The pointcut expression.
+ * @param pointcut - The expression expression.
  * @param argNames - The argument names.
  * @returns A method decorator to apply the after throwing advice.
  * @see MethodDecorator
@@ -316,7 +318,7 @@ export function AfterThrowing(pointcut: string, argNames?: string): MethodDecora
 
 /**
  * Decorator to define an after (finally) advice.
- * @param pointcut - The pointcut expression.
+ * @param pointcut - The expression expression.
  * @param argNames - The argument names.
  * @returns A method decorator to apply the after (finally) advice.
  * @see MethodDecorator
@@ -360,7 +362,7 @@ export function After(pointcut: string, argNames?: string): MethodDecorator {
 
 /**
  * Decorator to define an around advice.
- * @param pointcut - The pointcut expression.
+ * @param pointcut - The expression expression.
  * @param argNames - The argument names.
  * @returns A method decorator to apply the around advice.
  * @see MethodDecorator

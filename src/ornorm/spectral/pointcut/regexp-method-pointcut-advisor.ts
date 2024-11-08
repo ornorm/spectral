@@ -1,5 +1,5 @@
 /**
- * @file regexp-method-pointcut-advisor.ts
+ * @file regexp-method-expression-advisor.ts
 *  @description This file contains the implementation of the RegexpMethodPointcutAdvisor
  * class for the Spectral framework.
  * @author Aimé Biendo <abiendo@gmail.com>
@@ -21,14 +21,14 @@
 import {Advice, Advisor, RegexpMethodPointcut} from '@ornorm/spectral';
 
 /**
- * Class representing a pointcut advisor that combines a pointcut and advice.
+ * Class representing a expression advisor that combines a expression and advice.
  * @see Advisor
  */
 export class RegexpMethodPointcutAdvisor extends Advisor {
     /**
      * Creates an instance of RegexpMethodPointcutAdvisor.
-     * @param advice - The advice to be applied at the pointcut.
-     * @param patterns - An array of string patterns to be used in the pointcut.
+     * @param advice - The advice to be applied at the expression.
+     * @param patterns - An array of string patterns to be used in the expression.
      * @see Advice
      */
     constructor(advice: Advice, patterns: Array<string>) {

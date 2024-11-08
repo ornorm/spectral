@@ -1,6 +1,6 @@
 /**
  * @file point-cut.ts
- * @description This file contains the implementation of pointcut
+ * @description This file contains the implementation of expression
  * expressions and matchers for the Spectral framework.
  * @author Aimé Biendo <abiendo@gmail.com>
  * @version 0.0.1
@@ -22,16 +22,16 @@ import {Method, Type} from '@ornorm/spectral';
 
 /**
  * Type alias for a function that validates whether a given target matches
- * a pointcut expression.
+ * a expression expression.
  *
- * @param target The target to validate against the pointcut expression.
- * @returns Returns true if the target matches the pointcut expression,
+ * @param target The target to validate against the expression expression.
+ * @returns Returns true if the target matches the expression expression,
  * otherwise false.
  */
 export type MatchPointcut = (target: any) => boolean;
 
 /**
- * The ClassFilter interface is used to restrict the pointcut to a given set
+ * The ClassFilter interface is used to restrict the expression to a given set
  * of target classes.
  *
  * If the matches method always returns true, all target classes are
@@ -58,7 +58,7 @@ export function isClassFilter(obj: any): obj is ClassFilter {
 }
 
 /**
- * The MethodMatcher interface is used to restrict the pointcut to a given
+ * The MethodMatcher interface is used to restrict the expression to a given
  * set of target methods.
  *
  * If the matches method always returns true, all target methods are
@@ -106,11 +106,19 @@ export function isMethodMatcher(obj: any): obj is MethodMatcher {
 }
 
 /**
- * Pointcut handlers enables pointcut reuse independent of advice types.
+ * Type alias for a expression, which can be either a
+ * ClassFilter or a MethodMatcher.
+ * @see ClassFilter
+ * @see MethodMatcher
+ */
+export type PointcutExpression = ClassFilter | MethodMatcher;
+
+/**
+ * Pointcut handlers enables expression reuse independent of advice types.
  *
- * You can target different advice with the same pointcut.
+ * You can target different advice with the same expression.
  *
- * The pointcut interface is the central interface, used to target advice
+ * The expression interface is the central interface, used to target advice
  * to particular classes and methods.
  * @see ClassFilter
  * @see MethodMatcher
@@ -148,9 +156,9 @@ export interface PointcutHandler extends ClassFilter, MethodMatcher {
 export class PointcutOperations {
     /**
      * Combines two pointcuts using union logic.
-     * @param pointcut1 The first pointcut.
-     * @param pointcut2 The second pointcut.
-     * @returns A combined pointcut that matches if either pointcut matches.
+     * @param pointcut1 The first expression.
+     * @param pointcut2 The second expression.
+     * @returns A combined expression that matches if either expression matches.
      * @see MatchPointcut
      */
     public static union(pointcut1: MatchPointcut, pointcut2: MatchPointcut): MatchPointcut {
@@ -159,12 +167,14 @@ export class PointcutOperations {
 
     /**
      * Combines two pointcuts using intersection logic.
-     * @param pointcut1 The first pointcut.
-     * @param pointcut2 The second pointcut.
-     * @returns A combined pointcut that matches if both pointcuts match.
+     * @param pointcut1 The first expression.
+     * @param pointcut2 The second expression.
+     * @returns A combined expression that matches if both pointcuts match.
      * @see MatchPointcut
      */
-    public static intersection(pointcut1: MatchPointcut, pointcut2: MatchPointcut): MatchPointcut {
+    public static intersection(
+        pointcut1: MatchPointcut, pointcut2: MatchPointcut
+    ): MatchPointcut {
         return (target: any): boolean => pointcut1(target) && pointcut2(target);
     }
 }
@@ -173,9 +183,9 @@ export class PointcutOperations {
  * **\@Pointcut**
  *
  *
- * Decorator to define a pointcut.
- * @param expression The pointcut expression.
- * @returns A function to define the pointcut metadata.
+ * Decorator to define a expression.
+ * @param expression The expression expression.
+ * @returns A function to define the expression metadata.
  * @see MethodDecorator
  */
 export function Pointcut(expression: string): MethodDecorator {
@@ -185,16 +195,16 @@ export function Pointcut(expression: string): MethodDecorator {
 }
 
 /**
- * Class responsible for parsing and evaluating pointcut expressions.
+ * Class responsible for parsing and evaluating expression expressions.
  */
 export class PointcutExpressionParser {
     private static pointcutMethods: Map<string, MatchPointcut> =
         new Map<string, MatchPointcut>();
 
     /**
-     * Retrieves a registered pointcut method by its name.
-     * @param name The name of the pointcut.
-     * @returns The pointcut method if found, otherwise undefined.
+     * Retrieves a registered expression method by its name.
+     * @param name The name of the expression.
+     * @returns The expression method if found, otherwise undefined.
      * @see MatchPointcut
      */
     public static getPointcut(name: string): MatchPointcut | undefined {
@@ -202,26 +212,26 @@ export class PointcutExpressionParser {
     }
 
     /**
-     * Deletes a registered pointcut method by its name.
-     * @param name The name of the pointcut to delete.
+     * Deletes a registered expression method by its name.
+     * @param name The name of the expression to delete.
      */
     public static deletePointcut(name: string): void {
         this.pointcutMethods.delete(name);
     }
 
     /**
-     * Checks if a pointcut with the given name is registered.
-     * @param name The name of the pointcut.
-     * @returns True if the pointcut is registered, otherwise false.
+     * Checks if a expression with the given name is registered.
+     * @param name The name of the expression.
+     * @returns True if the expression is registered, otherwise false.
      */
     public static hasPointcut(name: string): boolean {
         return this.pointcutMethods.has(name);
     }
 
     /**
-     * Parses a pointcut expression.
-     * @param expression The pointcut expression to parse.
-     * @returns A `MatchPointcut` representing the parsed pointcut.
+     * Parses a expression expression.
+     * @param expression The expression expression to parse.
+     * @returns A `MatchPointcut` representing the parsed expression.
      * @throws SyntaxError if the expression is invalid.
      * @see MatchPointcut
      */
@@ -261,8 +271,8 @@ export class PointcutExpressionParser {
     }
 
     /**
-     * Registers a pointcut method.
-     * @param name The name of the pointcut.
+     * Registers a expression method.
+     * @param name The name of the expression.
      * @param method The method to register.
      * @see MatchPointcut
      */
@@ -271,9 +281,9 @@ export class PointcutExpressionParser {
     }
 
     /**
-     * Evaluates the parsed pointcut expression stack.
-     * @param stack The stack of parsed pointcut expressions.
-     * @returns A `MatchPointcut` representing the evaluated pointcut.
+     * Evaluates the parsed expression expression stack.
+     * @param stack The stack of parsed expression expressions.
+     * @returns A `MatchPointcut` representing the evaluated expression.
      * @see MatchPointcut
      */
     private static evaluate(stack: Array<MatchPointcut | string>): MatchPointcut {
@@ -301,10 +311,10 @@ export class PointcutExpressionParser {
     }
 
     /**
-     * Parses an `@annotation` pointcut expression.
-     * @param token The `@annotation` pointcut expression to parse.
+     * Parses an `@annotation` expression expression.
+     * @param token The `@annotation` expression expression to parse.
      * @returns A `MatchPointcut` representing the parsed `@annotation`
-     * pointcut.
+     * expression.
      * @throws SyntaxError if the expression is invalid.
      * @see MatchPointcut
      */
@@ -321,9 +331,9 @@ export class PointcutExpressionParser {
     }
 
     /**
-     * Parses an `args` pointcut expression.
-     * @param token The `args` pointcut expression to parse.
-     * @returns A function representing the parsed `args` pointcut.
+     * Parses an `args` expression expression.
+     * @param token The `args` expression expression to parse.
+     * @returns A function representing the parsed `args` expression.
      * @throws SyntaxError if the expression is invalid.
      * @see MatchPointcut
      */
@@ -346,9 +356,9 @@ export class PointcutExpressionParser {
     }
 
     /**
-     * Parses a `@args` pointcut expression.
-     * @param token The `@args` pointcut expression to parse.
-     * @returns A `MatchPointcut` representing the parsed `@args` pointcut.
+     * Parses a `@args` expression expression.
+     * @param token The `@args` expression expression to parse.
+     * @returns A `MatchPointcut` representing the parsed `@args` expression.
      * @throws SyntaxError if the expression is invalid.
      * @see MatchPointcut
      */
@@ -370,10 +380,10 @@ export class PointcutExpressionParser {
     }
 
     /**
-     * Parses a `@target` pointcut expression.
-     * @param token The `@target` pointcut expression to parse.
+     * Parses a `@target` expression expression.
+     * @param token The `@target` expression expression to parse.
      * @returns A `MatchPointcut` representing the parsed `@target`
-     * pointcut.
+     * expression.
      * @throws SyntaxError if the expression is invalid.
      * @see MatchPointcut
      */
@@ -390,9 +400,9 @@ export class PointcutExpressionParser {
     }
 
     /**
-     * Parses an `@within` pointcut expression.
-     * @param token The `@within` pointcut expression to parse.
-     * @returns A `MatchPointcut` representing the parsed `@within` pointcut.
+     * Parses an `@within` expression expression.
+     * @param token The `@within` expression expression to parse.
+     * @returns A `MatchPointcut` representing the parsed `@within` expression.
      * @throws SyntaxError if the expression is invalid.
      * @see MatchPointcut
      */
@@ -409,9 +419,9 @@ export class PointcutExpressionParser {
     }
 
     /**
-     * Parses a `bean` pointcut expression.
-     * @param token The `bean` pointcut expression to parse.
-     * @returns A `MatchPointcut` representing the parsed `bean` pointcut.
+     * Parses a `bean` expression expression.
+     * @param token The `bean` expression expression to parse.
+     * @returns A `MatchPointcut` representing the parsed `bean` expression.
      * @throws SyntaxError if the expression is invalid.
      * @see MatchPointcut
      */
@@ -428,10 +438,10 @@ export class PointcutExpressionParser {
     }
 
     /**
-     * Parses an `execution` pointcut expression.
-     * @param token The `execution` pointcut expression to parse.
+     * Parses an `execution` expression expression.
+     * @param token The `execution` expression expression to parse.
      * @returns A `MatchPointcut` representing the parsed `execution`
-     * pointcut.
+     * expression.
      * @throws SyntaxError if the expression is invalid.
      * @see MatchPointcut
      */
@@ -450,9 +460,9 @@ export class PointcutExpressionParser {
     }
 
     /**
-     * Parses a `target` pointcut expression.
-     * @param token The `target` pointcut expression to parse.
-     * @returns A `MatchPointcut` representing the parsed `target` pointcut.
+     * Parses a `target` expression expression.
+     * @param token The `target` expression expression to parse.
+     * @returns A `MatchPointcut` representing the parsed `target` expression.
      * @throws SyntaxError if the expression is invalid.
      * @see MatchPointcut
      */
@@ -469,9 +479,9 @@ export class PointcutExpressionParser {
     }
 
     /**
-     * Parses a `this` pointcut expression.
-     * @param token The `this` pointcut expression to parse.
-     * @returns A `MatchPointcut` representing the parsed `this` pointcut.
+     * Parses a `this` expression expression.
+     * @param token The `this` expression expression to parse.
+     * @returns A `MatchPointcut` representing the parsed `this` expression.
      * @throws SyntaxError if the expression is invalid.
      * @see MatchPointcut
      */
@@ -488,9 +498,9 @@ export class PointcutExpressionParser {
     }
 
     /**
-     * Parses a `within` pointcut expression.
-     * @param token The `within` pointcut expression to parse.
-     * @returns A `MatchPointcut` representing the parsed `within` pointcut.
+     * Parses a `within` expression expression.
+     * @param token The `within` expression expression to parse.
+     * @returns A `MatchPointcut` representing the parsed `within` expression.
      * @throws SyntaxError if the expression is invalid.
      * @see MatchPointcut
      */

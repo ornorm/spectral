@@ -21,14 +21,14 @@
 import {Advice, Advisor, PointcutSelector} from '@ornorm/spectral';
 
 /**
- * Class representing an advisor that uses a pointcut selector to determine
+ * Class representing an advisor that uses a expression selector to determine
  * if a method matches the criteria.
  */
 export class PointcutSelectorAdvisor extends Advisor {
     /**
      * Creates an instance of `PointcutSelectorAdvisor`.
-     * @param advice - The advice to be applied at the pointcut.
-     * @param selector - The pointcut selector to be used for matching.
+     * @param advice - The advice to be applied at the expression.
+     * @param selector - The expression selector to be used for matching.
      * @see Advice
      */
     constructor(advice: Advice, selector: string) {

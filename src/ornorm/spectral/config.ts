@@ -21,20 +21,6 @@
 import {AdviceType} from '@ornorm/spectral';
 
 /**
- * Represents the configuration for a pointcut.
- */
-export type PointcutConfig = {
-    /**
-     * The unique identifier for the pointcut.
-     */
-    id: string;
-    /**
-     * The expression that defines the pointcut.
-     */
-    expression: string;
-};
-
-/**
  * Represents the configuration for an advice.
  */
 export type AdviceConfig = {
@@ -42,19 +28,19 @@ export type AdviceConfig = {
      * The type of advice.
      * @see AdviceType
      */
-    type: AdviceType;
+    readonly type: AdviceType;
     /**
-     * The reference to a pointcut by its id.
+     * The reference to a expression by its id.
      */
     pointcutRef?: string;
     /**
-     * The pointcut expression.
+     * The expression expression.
      */
     pointcut?: string;
     /**
      * The method name that contains the advice logic.
      */
-    method: string;
+    readonly method: string;
     /**
      * The name of the returning value (used in afterReturning advice).
      */
@@ -76,19 +62,20 @@ export type AdvisorConfig = {
     /**
      * The unique identifier for the advisor.
      */
-    id: string;
+    readonly id: string;
     /**
      * The advice configuration associated with the advisor.
      * @see AdviceConfig
      */
-    advice: AdviceConfig;
+    readonly advice: AdviceConfig;
     /**
-     * The pointcut configuration associated with the advisor.
+     * The expression configuration associated with the advisor.
+     *
      * Can be either a class filter or a method matcher.
-     * @see ClassFilterConfig
-     * @see MethodMatcherConfig
+     *
+     * @see PointcutExpressionConfig
      */
-    pointcut: ClassFilterConfig | MethodMatcherConfig;
+    readonly expression: PointcutExpressionConfig;
 };
 
 /**
@@ -98,11 +85,11 @@ export type ClassFilterConfig = {
     /**
      * The unique identifier for the class filter.
      */
-    id: string;
+    readonly id: string;
     /**
      * The class name pattern to match.
      */
-    pattern: string;
+    readonly pattern: string | RegExp | Array<string | RegExp>;
 };
 
 /**
@@ -112,16 +99,39 @@ export type MethodMatcherConfig = {
     /**
      * The unique identifier for the method matcher.
      */
-    id: string;
+    readonly id: string;
     /**
      * Flag to indicate if the method matcher is evaluated at runtime.
      */
-    isRuntime: boolean;
+    isRuntime?: boolean;
     /**
      * The pattern to match method names.
      */
-    pattern: string;
+    readonly pattern: string | RegExp | Array<string | RegExp>;
 };
+
+/**
+ * Represents the configuration for a expression.
+ */
+export type PointcutConfig = {
+    /**
+     * The unique identifier for the expression.
+     */
+    readonly id: string;
+    /**
+     * The expression that defines the expression.
+     */
+    readonly expression: string;
+};
+
+/**
+ * Represents the configuration for a pointcut expression.
+ *
+ * This type can be either a ClassFilterConfig or a MethodMatcherConfig.
+ * @see ClassFilterConfig
+ * @see MethodMatcherConfig
+ */
+export type PointcutExpressionConfig = ClassFilterConfig | MethodMatcherConfig;
 
 /**
  * Represents the configuration for an aspect.
@@ -130,11 +140,11 @@ export type AspectConfig = {
     /**
      * The unique identifier for the aspect.
      */
-    id: string;
+    readonly id: string;
     /**
      * The reference to the aspect class.
      */
-    ref: string;
+    readonly ref: string;
     /**
      * The order in which the aspect should be applied.
      */
@@ -148,7 +158,7 @@ export type AspectConfig = {
      * The advices defined within the aspect.
      * @see AdviceConfig
      */
-    advices: Array<AdviceConfig>;
+    readonly advices: Array<AdviceConfig>;
 };
 
 /**
@@ -164,7 +174,7 @@ export type AopConfig = {
      * The aspects defined in the configuration.
      * @see AspectConfig
      */
-    aspects: Array<AspectConfig>;
+    readonly aspects: Array<AspectConfig>;
     /**
      * The advisors defined in the configuration.
      * @see AdvisorConfig

@@ -1,5 +1,5 @@
 /**
- * @file regexp-method-pointcut.ts
+ * @file regexp-method-expression.ts
  * @description This file contains the implementation of the RegexpMethodPointcut
  * class for the Spectral framework.
  * @author Aimé Biendo <abiendo@gmail.com>
@@ -21,7 +21,7 @@
 import { Method, MethodMatcher, Type } from '@ornorm/spectral';
 
 /**
- * Class representing a static pointcut using regular expressions.
+ * Class representing a static expression using regular expressions.
  * @see MethodMatcher
  */
 export class RegexpMethodPointcut implements MethodMatcher {
@@ -63,7 +63,7 @@ export class RegexpMethodPointcut implements MethodMatcher {
         let matchMethod: boolean = false;
         let matchType: boolean = false;
         if (this.isRuntime) {
-            // Runtime pointcut: consider method arguments
+            // Runtime expression: consider method arguments
             if (args.length >= 2) {
                 for (const reg of this.patterns) {
                     const match: RegExpExecArray | null = reg.exec(method.name);
@@ -97,7 +97,7 @@ export class RegexpMethodPointcut implements MethodMatcher {
                     pattern.test(method.name));
             }
         } else {
-            // Static pointcut: do not consider method arguments
+            // Static expression: do not consider method arguments
             matchMethod = this.patterns.some((pattern: RegExp): boolean =>
                 pattern.test(method.name));
         }
