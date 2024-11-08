@@ -41,9 +41,21 @@
             }
           },
           "required": ["location"]
+        },
+        "load-time-weaver": {
+          "type": "object",
+          "description": "Enable load-time weaving with AspectJ."
+        },
+        "spring-configured": {
+          "type": "object",
+          "description": "Enable AspectJ to dependency inject domain objects with Spring."
+        },
+        "mbean-export": {
+          "type": "object",
+          "description": "Enable annotation-based MBean export."
         }
       },
-      "required": ["component-scan", "annotation-config", "property-placeholder"]
+      "required": ["component-scan", "annotation-config", "property-placeholder", "load-time-weaver", "spring-configured", "mbean-export"]
     },
     "aop": {
       "type": "object",
