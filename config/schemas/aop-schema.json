@@ -192,6 +192,10 @@
             "returning": {
               "type": "string",
               "description": "The name of the parameter to which the return value should be passed."
+            },
+            "throwing": {
+              "type": "string",
+              "description": "The name of the parameter to which the thrown exception should be passed."
             }
           },
           "required": ["id", "method"]
