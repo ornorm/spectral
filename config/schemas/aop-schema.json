@@ -13,7 +13,9 @@
           }
         }
       },
-      "required": ["bean"]
+      "required": [
+        "bean"
+      ]
     },
     "context": {
       "type": "object",
@@ -26,7 +28,9 @@
               "description": "The base package for component scanning."
             }
           },
-          "required": ["base-package"]
+          "required": [
+            "base-package"
+          ]
         },
         "annotation-config": {
           "type": "boolean",
@@ -40,7 +44,9 @@
               "description": "The location of the properties file."
             }
           },
-          "required": ["location"]
+          "required": [
+            "location"
+          ]
         },
         "load-time-weaver": {
           "type": "object",
@@ -55,7 +61,10 @@
               "description": "The fully qualified class name of the LoadTimeWeaver implementation."
             }
           },
-          "required": ["class", "weaver-class"]
+          "required": [
+            "class",
+            "weaver-class"
+          ]
         },
         "spring-configured": {
           "type": "object",
@@ -66,7 +75,14 @@
           "description": "Enable annotation-based MBean export."
         }
       },
-      "required": ["component-scan", "annotation-config", "property-placeholder", "load-time-weaver", "spring-configured", "mbean-export"]
+      "required": [
+        "component-scan",
+        "annotation-config",
+        "property-placeholder",
+        "load-time-weaver",
+        "spring-configured",
+        "mbean-export"
+      ]
     },
     "aop": {
       "type": "object",
@@ -114,7 +130,11 @@
               "description": "Path to the META-INF/aop.xml file."
             }
           },
-          "required": ["id", "ref", "aop-xml"]
+          "required": [
+            "id",
+            "ref",
+            "aop-xml"
+          ]
         }
       }
     },
@@ -139,10 +159,16 @@
               "description": "Aspect elements within <aop:config>."
             }
           },
-          "required": ["pointcut", "advisor", "aspect"]
+          "required": [
+            "pointcut",
+            "advisor",
+            "aspect"
+          ]
         }
       },
-      "required": ["config"]
+      "required": [
+        "config"
+      ]
     },
     "declaringAspect": {
       "type": "object",
@@ -161,7 +187,10 @@
               "description": "Reference to the backing bean."
             }
           },
-          "required": ["id", "ref"]
+          "required": [
+            "id",
+            "ref"
+          ]
         },
         "bean": {
           "type": "object",
@@ -176,10 +205,16 @@
               "description": "The class name of the bean."
             }
           },
-          "required": ["id", "class"]
+          "required": [
+            "id",
+            "class"
+          ]
         }
       },
-      "required": ["aspect", "bean"]
+      "required": [
+        "aspect",
+        "bean"
+      ]
     },
     "declaringPointcut": {
       "type": "object",
@@ -198,10 +233,15 @@
               "description": "The pointcut expression."
             }
           },
-          "required": ["id", "expression"]
+          "required": [
+            "id",
+            "expression"
+          ]
         }
       },
-      "required": ["pointcut"]
+      "required": [
+        "pointcut"
+      ]
     },
     "declaringAdvice": {
       "type": "object",
@@ -264,10 +304,15 @@
               "description": "The method providing the body of the after throwing advice."
             }
           },
-          "required": ["id", "method"]
+          "required": [
+            "id",
+            "method"
+          ]
         }
       },
-      "required": ["advice"]
+      "required": [
+        "advice"
+      ]
     },
     "adviceParameters": {
       "type": "object",
@@ -290,7 +335,12 @@
           "description": "Comma-delimited list of parameter names."
         }
       },
-      "required": ["pointcut", "advisor", "aspect", "arg-names"]
+      "required": [
+        "pointcut",
+        "advisor",
+        "aspect",
+        "arg-names"
+      ]
     },
     "adviceOrdering": {
       "type": "object",
@@ -305,7 +355,10 @@
           "description": "The precedence between aspects is determined via the order attribute in the <aop:aspect> element or by using the @Order annotation."
         }
       },
-      "required": ["order", "precedence"]
+      "required": [
+        "order",
+        "precedence"
+      ]
     },
     "aspectInstantiationModels": {
       "type": "object",
@@ -316,7 +369,9 @@
           "description": "The only supported instantiation model for schema-defined aspects is the singleton model."
         }
       },
-      "required": ["singleton"]
+      "required": [
+        "singleton"
+      ]
     },
     "advisors": {
       "type": "object",
@@ -339,10 +394,15 @@
               "description": "The order attribute to define the Ordered value of the advisor."
             }
           },
-          "required": ["pointcut-ref", "advice-ref"]
+          "required": [
+            "pointcut-ref",
+            "advice-ref"
+          ]
         }
       },
-      "required": ["advisor"]
+      "required": [
+        "advisor"
+      ]
     },
     "mixingAspectTypes": {
       "type": "object",
@@ -353,7 +413,9 @@
           "description": "It is perfectly possible to mix @AspectJ style aspects by using the auto-proxying support, schema-defined <aop:aspect> aspects, <aop:advisor> declared advisors, and even proxies and interceptors in other styles in the same configuration."
         }
       },
-      "required": ["description"]
+      "required": [
+        "description"
+      ]
     },
     "choosingAopDeclarationStyle": {
       "type": "object",
@@ -375,10 +437,16 @@
               "description": "Using proxy-target-class=\"true\" on <tx:annotation-driven/>, <aop:aspectj-autoproxy/>, or <aop:config/> elements forces the use of CGLIB proxies for all three of them."
             }
           },
-          "required": ["jdkDynamicProxies", "cglibProxies", "proxyTargetClass"]
+          "required": [
+            "jdkDynamicProxies",
+            "cglibProxies",
+            "proxyTargetClass"
+          ]
         }
       },
-      "required": ["proxyingMechanisms"]
+      "required": [
+        "proxyingMechanisms"
+      ]
     }
   },
   "definitions": {
@@ -412,7 +480,9 @@
                     "description": "The static field to inject."
                   }
                 },
-                "required": ["static-field"]
+                "required": [
+                  "static-field"
+                ]
               }
             ]
           }
@@ -436,7 +506,9 @@
                     "description": "The static field to inject."
                   }
                 },
-                "required": ["static-field"]
+                "required": [
+                  "static-field"
+                ]
               }
             ]
           }
@@ -454,7 +526,10 @@
               "description": "The path to the property."
             }
           },
-          "required": ["id", "path"]
+          "required": [
+            "id",
+            "path"
+          ]
         },
         "listFactory": {
           "type": "object",
@@ -476,7 +551,10 @@
               "description": "The class of the list to instantiate."
             }
           },
-          "required": ["id", "sourceList"]
+          "required": [
+            "id",
+            "sourceList"
+          ]
         },
         "mapFactory": {
           "type": "object",
@@ -498,7 +576,10 @@
               "description": "The class of the map to instantiate."
             }
           },
-          "required": ["id", "sourceMap"]
+          "required": [
+            "id",
+            "sourceMap"
+          ]
         },
         "setFactory": {
           "type": "object",
@@ -520,10 +601,16 @@
               "description": "The class of the set to instantiate."
             }
           },
-          "required": ["id", "sourceSet"]
+          "required": [
+            "id",
+            "sourceSet"
+          ]
         }
       },
-      "required": ["id", "class"]
+      "required": [
+        "id",
+        "class"
+      ]
     },
     "meta": {
       "type": "object",
@@ -537,7 +624,10 @@
           "description": "The value of the metadata."
         }
       },
-      "required": ["key", "value"]
+      "required": [
+        "key",
+        "value"
+      ]
     },
     "aspect": {
       "type": "object",
@@ -585,7 +675,71 @@
           "description": "The body of the aspect."
         }
       },
-      "required": ["id", "body"]
+      "required": [
+        "id",
+        "body"
+      ]
+    },
+    "advice": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "The unique identifier for the advice."
+        },
+        "pointcut-ref": {
+          "type": "string",
+          "description": "Reference to a named pointcut."
+        },
+        "pointcut": {
+          "type": "string",
+          "description": "Inline pointcut expression."
+        },
+        "method": {
+          "type": "string",
+          "description": "The method providing the body of the advice."
+        },
+        "returning": {
+          "type": "string",
+          "description": "The name of the parameter to which the return value should be passed."
+        },
+        "throwing": {
+          "type": "string",
+          "description": "The name of the parameter to which the thrown exception should be passed."
+        },
+        "finally": {
+          "type": "string",
+          "description": "The method providing the body of the after (finally) advice."
+        },
+        "around": {
+          "type": "string",
+          "description": "The method providing the body of the around advice."
+        },
+        "arg-names": {
+          "type": "string",
+          "description": "Comma-delimited list of parameter names."
+        },
+        "before": {
+          "type": "string",
+          "description": "The method providing the body of the before advice."
+        },
+        "after": {
+          "type": "string",
+          "description": "The method providing the body of the after advice."
+        },
+        "afterReturning": {
+          "type": "string",
+          "description": "The method providing the body of the after returning advice."
+        },
+        "afterThrowing": {
+          "type": "string",
+          "description": "The method providing the body of the after throwing advice."
+        }
+      },
+      "required": [
+        "id",
+        "method"
+      ]
     }
   }
 }
