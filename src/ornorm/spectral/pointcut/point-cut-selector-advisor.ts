@@ -1,7 +1,7 @@
 /**
- * @file index.ts
- * @description This file serves as the main entry point for the Weaver
- * module in the Spectral framework.
+ * @file point-cut-selector-advisor.ts
+ * @description This file contains the implementation of the PointcutSelectorAdvisor
+ * class for the Spectral framework.
  * @author Aimé Biendo <abiendo@gmail.com>
  * @version 0.0.1
  *
@@ -18,4 +18,20 @@
  * 3. This notice may not be removed or altered from any source distribution.
  */
 
-export * from './spectral';
+import {Advice, Advisor, PointcutSelector} from '@ornorm/spectral';
+
+/**
+ * Class representing an advisor that uses a expression selector to determine
+ * if a method matches the criteria.
+ */
+export class PointcutSelectorAdvisor extends Advisor {
+    /**
+     * Creates an instance of `PointcutSelectorAdvisor`.
+     * @param advice - The advice to be applied at the expression.
+     * @param selector - The expression selector to be used for matching.
+     * @see Advice
+     */
+    constructor(advice: Advice, selector: string) {
+        super(advice, new PointcutSelector(selector));
+    }
+}

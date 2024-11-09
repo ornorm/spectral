@@ -1,7 +1,7 @@
 /**
  * @file index.ts
- * @description This file serves as the main entry point for the Weaver
- * module in the Spectral framework.
+ * @description This file serves as the main entry point for the Spectral
+ * framework, re-exporting all the core modules.
  * @author Aimé Biendo <abiendo@gmail.com>
  * @version 0.0.1
  *
@@ -18,4 +18,7 @@
  * 3. This notice may not be removed or altered from any source distribution.
  */
 
-export * from './spectral';
+export  * from './point-cut-selector';
+export * from './point-cut-selector-advisor';
+export  * from './regexp-method-pointcut';
+export * from './regexp-method-pointcut-advisor';

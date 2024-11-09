@@ -1,6 +1,6 @@
 /**
- * @file index.ts
- * @description This file serves as the main entry point for the Weaver
+ * @file disposable.ts
+* @description This file contains the implementation for the Disposable
  * module in the Spectral framework.
  * @author Aimé Biendo <abiendo@gmail.com>
  * @version 0.0.1
@@ -18,4 +18,12 @@
  * 3. This notice may not be removed or altered from any source distribution.
  */
 
-export * from './spectral';
+/**
+ * Represents a resource that can be disposed.
+ */
+export interface Disposable {
+    /**
+     * Disposes the resources.
+     */
+    dispose(): void;
+}

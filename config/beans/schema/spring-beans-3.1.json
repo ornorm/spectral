@@ -1,0 +1,302 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Spring Beans",
+  "type": "object",
+  "properties": {
+    "beans": {
+      "type": "object",
+      "properties": {
+        "description": {
+          "type": "string"
+        },
+        "import": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "resource": {
+                "type": "string"
+              }
+            },
+            "required": ["resource"]
+          }
+        },
+        "alias": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "name": {
+                "type": "string"
+              },
+              "alias": {
+                "type": "string"
+              }
+            },
+            "required": ["name", "alias"]
+          }
+        },
+        "bean": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              },
+              "class": {
+                "type": "string"
+              },
+              "scope": {
+                "type": "string"
+              },
+              "lazy-init": {
+                "type": "string"
+              },
+              "autowire": {
+                "type": "string"
+              },
+              "depends-on": {
+                "type": "string"
+              },
+              "init-method": {
+                "type": "string"
+              },
+              "destroy-method": {
+                "type": "string"
+              },
+              "factory-method": {
+                "type": "string"
+              },
+              "factory-bean": {
+                "type": "string"
+              }
+            },
+            "required": ["id", "class"]
+          }
+        }
+      },
+      "required": ["bean"]
+    },
+    "meta": {
+      "type": "object",
+      "properties": {
+        "key": {
+          "type": "string"
+        },
+        "value": {
+          "type": "string"
+        }
+      },
+      "required": ["key", "value"]
+    },
+    "constructor-arg": {
+      "type": "object",
+      "properties": {
+        "index": {
+          "type": "string"
+        },
+        "type": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "ref": {
+          "type": "string"
+        },
+        "value": {
+          "type": "string"
+        }
+      }
+    },
+    "property": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "ref": {
+          "type": "string"
+        },
+        "value": {
+          "type": "string"
+        }
+      },
+      "required": ["name"]
+    },
+    "qualifier": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "type": "string",
+          "default": "org.springframework.beans.factory.annotation.Qualifier"
+        },
+        "value": {
+          "type": "string"
+        }
+      }
+    },
+    "lookup-method": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "bean": {
+          "type": "string"
+        }
+      }
+    },
+    "replaced-method": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "replacer": {
+          "type": "string"
+        }
+      }
+    },
+    "arg-type": {
+      "type": "object",
+      "properties": {
+        "match": {
+          "type": "string"
+        }
+      }
+    },
+    "ref": {
+      "type": "object",
+      "properties": {
+        "bean": {
+          "type": "string"
+        },
+        "parent": {
+          "type": "string"
+        }
+      }
+    },
+    "idref": {
+      "type": "object",
+      "properties": {
+        "bean": {
+          "type": "string"
+        }
+      }
+    },
+    "value": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "type": "string"
+        }
+      }
+    },
+    "null": {
+      "type": "object"
+    },
+    "array": {
+      "type": "object",
+      "properties": {
+        "merge": {
+          "type": "string",
+          "enum": ["default", "true", "false"]
+        }
+      }
+    },
+    "list": {
+      "type": "object",
+      "properties": {
+        "merge": {
+          "type": "string",
+          "enum": ["default", "true", "false"]
+        }
+      }
+    },
+    "set": {
+      "type": "object",
+      "properties": {
+        "merge": {
+          "type": "string",
+          "enum": ["default", "true", "false"]
+        }
+      }
+    },
+    "map": {
+      "type": "object",
+      "properties": {
+        "merge": {
+          "type": "string",
+          "enum": ["default", "true", "false"]
+        }
+      }
+    },
+    "entry": {
+      "type": "object",
+      "properties": {
+        "key": {
+          "type": "string"
+        },
+        "key-ref": {
+          "type": "string"
+        },
+        "value": {
+          "type": "string"
+        },
+        "value-ref": {
+          "type": "string"
+        },
+        "value-type": {
+          "type": "string"
+        }
+      }
+    },
+    "props": {
+      "type": "object",
+      "properties": {
+        "merge": {
+          "type": "string",
+          "enum": ["default", "true", "false"]
+        }
+      }
+    },
+    "key": {
+      "type": "object"
+    },
+    "prop": {
+      "type": "object",
+      "properties": {
+        "key": {
+          "type": "string"
+        }
+      }
+    },
+    "default-lazy-init": {
+      "type": "string",
+      "enum": ["default", "true", "false"]
+    },
+    "default-merge": {
+      "type": "string",
+      "enum": ["default", "true", "false"]
+    },
+    "default-autowire": {
+      "type": "string",
+      "enum": ["default", "no", "byName", "byType", "constructor"]
+    },
+    "default-autowire-candidates": {
+      "type": "string"
+    },
+    "default-init-method": {
+      "type": "string"
+    },
+    "default-destroy-method": {
+      "type": "string"
+    },
+    "profile": {
+      "type": "string"
+    }
+  },
+  "required": ["beans"]
+}

@@ -1,7 +1,7 @@
 /**
- * @file index.ts
- * @description This file serves as the main entry point for the Weaver
- * module in the Spectral framework.
+ * @file regexp-method-expression-advisor.ts
+*  @description This file contains the implementation of the RegexpMethodPointcutAdvisor
+ * class for the Spectral framework.
  * @author Aimé Biendo <abiendo@gmail.com>
  * @version 0.0.1
  *
@@ -18,4 +18,20 @@
  * 3. This notice may not be removed or altered from any source distribution.
  */
 
-export * from './spectral';
+import {Advice, Advisor, RegexpMethodPointcut} from '@ornorm/spectral';
+
+/**
+ * Class representing a expression advisor that combines a expression and advice.
+ * @see Advisor
+ */
+export class RegexpMethodPointcutAdvisor extends Advisor {
+    /**
+     * Creates an instance of RegexpMethodPointcutAdvisor.
+     * @param advice - The advice to be applied at the expression.
+     * @param patterns - An array of string patterns to be used in the expression.
+     * @see Advice
+     */
+    constructor(advice: Advice, patterns: Array<string>) {
+        super(advice, new RegexpMethodPointcut(patterns));
+    }
+}
