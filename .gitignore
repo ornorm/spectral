@@ -50,3 +50,6 @@ docs/
 # Windows
 Thumbs.db
 ehthumbs.db
+
+# Project specific
+@ornorm/
