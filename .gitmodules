@@ -1,0 +1,3 @@
+[submodule "libs/aspectT"]
+	path = libs/aspectT
+	url = https://github.com/ornorm/aspectT
