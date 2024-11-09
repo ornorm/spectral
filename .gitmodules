@@ -1,3 +1,0 @@
-[submodule "bin/aspectJ"]
-	path = bin/aspectJ
-	url = https://github.com/ornorm/spectral.git
